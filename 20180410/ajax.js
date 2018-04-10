@@ -1,51 +1,4 @@
 /**
- * request方法根据实际业务请求包装ajax方法
- * 如:统一异常处理,添加http请求头,请求展示loading等
- * @param settings
- */
-request = (settings = {}) => {
-    // todo 根据api接口情况添加权限请求头
-    settings.headers = settings.headers || {};
-    const autoHeader = 'Authorization';
-    let hasAuthorization = Object.keys(settings.headers).some(key => {
-        return key === autoHeader;
-    });
-    if (!hasAuthorization) {
-        settings.headers[autoHeader] = ''; // todo 从缓存中获取权限头
-    }
-    let beforeSendFn = settings.beforeSend || (() => {
-    });
-    let successFn = settings.success || (() => {
-    });
-    let errorFn = settings.error || (() => {
-    });
-    let completeFn = settings.complete || (() => {
-    });
-    settings.beforeSend = function (xhr) {
-        console.log('request show loading...');
-        beforeSendFn(xhr);
-    };
-    settings.success = (result, status, xhr) => {
-        console.log('request success...');
-        // todo 根据后台api判断是否请求成功
-        if (result && result instanceof Object && result.code !== 1) {
-            errorFn(xhr, status);
-            return;
-        }
-        successFn(result, status, xhr);
-    };
-    settings.error = (result, status, xhr) => {
-        console.log('request error...');
-        errorFn(xhr, status);
-    };
-    settings.complete = function (xhr, status) {
-        console.log('request hide loading...');
-        completeFn(xhr, status);
-    };
-    ajax(settings);
-};
-
-/**
  * js封装ajax请求
  * >>使用es6语法,使用new XMLHttpRequest创建请求对象,所以不考虑低端ie浏览器
  *
@@ -140,22 +93,23 @@ ajax = (settings = {}) => {
         }, _s.timeout);
     }
     // 发送请求.如果是简单请求,请求提应为null.否则,请求体类型需要和请求头Content-Type对应
-    xhr.send(useUrlParam ? null : getQueryString(_s.data));
+    xhr.send(useUrlParam ? null : getQueryData(_s.data));
 };
 
-
+// 把data参数拼装在url上
 let getQueryUrl = (url, data) => {
     if (!data) {
         return url;
     }
-    let paramsStr = getQueryString(data);
+    let paramsStr = data instanceof Object ? getQueryString(data) : data;
     if (paramsStr) {
         url += (url.indexOf('?') !== -1) ? paramsStr : '?' + paramsStr
     }
     return url;
 };
 
-let getQueryString = (data) => {
+// 获取ajax请求参数
+let getQueryData = (data) => {
     if (!data) {
         return null;
     }
@@ -165,10 +119,16 @@ let getQueryString = (data) => {
     if (data instanceof FormData) {
         return data;
     }
+    return getQueryString(data);
+};
+
+// 把对象转为查询字符串
+let getQueryString = (data) => {
     let paramsArr = [];
     if (data instanceof Object) {
         for (const key in data) {
             let val = data[key];
+            // todo Date类型需要根据后台api酌情处理
             if (val instanceof Date) {
                 val = dateFormat(val, 'yyyy-MM-dd hh:mm:ss')
             }
@@ -234,18 +194,117 @@ let dateFormat = (date, sFormat = 'yyyy-MM-dd') => {
         .replace(/fff/ig, String(time.Millisecond))
 };
 
-
-Function.prototype.before = function (fn) {
-    let originalFn = this;
+Function.prototype.before = function (beforeFn) {
+    let _self = this;
     return function () {
-        fn.apply(this, arguments);
-        originalFn.apply(this, arguments);
+        beforeFn.apply(this, arguments);
+        _self.apply(this, arguments);
     }
 };
-Function.prototype.after = function (fn) {
-    let originalFn = this;
+Function.prototype.after = function (afterFn) {
+    let _self = this;
     return function () {
-        originalFn.apply(this, arguments);
-        fn.apply(this, arguments);
+        _self.apply(this, arguments);
+        afterFn.apply(this, arguments);
+    }
+};
+
+/**
+ * 根据实际业务情况装饰 ajax 方法
+ * 如:统一异常处理,添加http请求头,请求展示loading等
+ * @param settings
+ */
+request = (settings = {}) => {
+    // 统一异常处理函数
+    let errorHandle = (xhr, status) => {
+        console.log('request error...');
+        if (status === 401) {
+            console.log('request 没有权限...');
+        }
+    };
+    // 使用before拦截参数的 beforeSend 回调函数
+    settings.beforeSend = (settings.beforeSend || function () {
+    }).before(xhr => {
+        console.log('request show loading...');
+    });
+    // 拦截参数的 success
+    settings.success = (settings.success || function () {
+    }).before((result, status, xhr) => {
+        console.log('request success...');
+        // todo 根据后台api判断是否请求成功
+        if (result && result instanceof Object && result.code !== 1) {
+            errorHandle(xhr, status);
+        }
+    });
+    // 拦截参数的 error
+    settings.error = (settings.error || function () {
+    }).before((result, status, xhr) => {
+        errorHandle(xhr, status);
+    });
+    // 拦截参数的 complete
+    settings.complete = (settings.complete || function () {
+    }).after((xhr, status) => {
+        console.log('request hide loading...');
+    });
+    // 请求添加权限头
+    (ajax.before(addAuthorizationHeader))(settings);
+};
+
+// 添加权限请求头
+let addAuthorizationHeader = (settings) => {
+    settings.headers = settings.headers || {};
+    const headerKey = 'Authorization';
+    // 判断是否已经存在权限header
+    let hasAuthorization = Object.keys(settings.headers).some(key => {
+        return key === headerKey;
+    });
+    if (!hasAuthorization) {
+        settings.headers[headerKey] = ''; // todo 从缓存中获取权限头
+    }
+};
+
+get = (settings = {}) => {
+    let addDefaultSettings = (settings) => {
+        settings.type = 'GET';
+        settings.dataType = 'json';
+    };
+    (request.before(addDefaultSettings))(settings);
+};
+
+del = (settings = {}) => {
+    let addDefaultSettings = (settings) => {
+        settings.type = 'DELETE';
+        settings.dataType = 'json';
+    };
+    (request.before(addDefaultSettings))(settings);
+};
+
+// 调用此方法,参数data应为查询字符串或普通对象
+post = (settings = {}) => {
+    let addDefaultSettings = (settings) => {
+        settings.type = 'POST';
+        settings.dataType = 'json';
+        settings.headers = {'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'};
+    };
+    (request.before(addDefaultSettings))(settings);
+};
+
+// 调用此方法,参数data应为json字符串
+postBody = (settings = {}) => {
+    let addDefaultSettings = (settings) => {
+        settings.type = 'POST';
+        settings.dataType = 'json';
+        settings.headers = {'Content-Type': 'application/json; charset=UTF-8'};
+    };
+    (request.before(addDefaultSettings))(settings);
+};
+
+let http = {
+    b:()=>{
+        console.log('b');
+    },
+    a:()=>{
+        console.log('a');
+        http.b();
     }
 };

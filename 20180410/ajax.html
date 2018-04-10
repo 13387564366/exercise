@@ -26,10 +26,6 @@
                 success: function (result, status, xhr) {
                     console.log(result, '\n status:', status, xhr);
                     debugger;
-                },
-                error: function (xhr, status) {
-                    console.log(xhr, '\n status:', status);
-                    debugger;
                 }
             });
         }
@@ -41,23 +37,15 @@
                 success: function (result, status, xhr) {
                     console.log(result, '\n status:', status, xhr);
                     debugger;
-                },
-                error: function (xhr, status) {
-                    console.log(xhr, '\n status:', status);
-                    debugger;
                 }
             });
         }
         if (id === 'get_timeout') {
-            request({
+            get({
                 url: url + id,
                 timeout: 1000,
                 success: function (result, status, xhr) {
                     console.log(result, '\n status:', status, xhr);
-                    debugger;
-                },
-                error: function (xhr, status) {
-                    console.log(xhr, '\n status:', status);
                     debugger;
                 }
             });
@@ -69,10 +57,6 @@
                 success: function (result, status, xhr) {
                     console.log(result, '\n status:', status, xhr);
                     debugger;
-                },
-                error: function (xhr, status) {
-                    console.log(xhr, '\n status:', status);
-                    debugger;
                 }
             });
         }
@@ -81,10 +65,6 @@
                 url: url + id,
                 success: function (result, status, xhr) {
                     console.log(result, '\n status:', status, xhr);
-                    debugger;
-                },
-                error: function (xhr, status) {
-                    console.log(xhr, '\n status:', status);
                     debugger;
                 }
             });
@@ -101,10 +81,6 @@
                 success: function (result, status, xhr) {
                     console.log(result, '\n status:', status, xhr);
                     debugger;
-                },
-                error: function (xhr, status) {
-                    console.log(xhr, '\n status:', status);
-                    debugger;
                 }
             });
         }
@@ -120,10 +96,6 @@
                 success: function (result, status, xhr) {
                     console.log(result, '\n status:', status, xhr);
                     debugger;
-                },
-                error: function (xhr, status) {
-                    console.log(xhr, '\n status:', status);
-                    debugger;
                 }
             });
         }
@@ -137,10 +109,6 @@
                 data: JSON.stringify({name: '哈哈', age: 12, birthday: dateFormat(new Date(), 'yyyy-MM-dd hh:mm:ss')}),
                 success: function (result, status, xhr) {
                     console.log(result, '\n status:', status, xhr);
-                    debugger;
-                },
-                error: function (xhr, status) {
-                    console.log(xhr, '\n status:', status);
                     debugger;
                 }
             });
