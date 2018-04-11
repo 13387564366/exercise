@@ -27,7 +27,9 @@ const http = {
       return;
     }
     // 创建XMLHttpRequest请求对象
-    let xhr = new XMLHttpRequest(), timeoutTimer, timedOut = false;
+    let xhr = new XMLHttpRequest();
+    let timeoutTimer;
+    let timedOut = false;
     // 请求回调函数
     xhr.onreadystatechange = () => {
       if (xhr.readyState !== 4) {
@@ -62,12 +64,13 @@ const http = {
     };
 
     // 如果是"简单"请求,则把data参数组装在url上
-    let useUrlParam = false, sType = _s.type.toUpperCase();
+    let useUrlParam = false;
+    let sType = _s.type.toUpperCase();
     if (sType === 'GET' || sType === 'DELETE') {
       useUrlParam = true;
       _s.url = http.getQueryUrl(_s.url, _s.data);
     }
-    //调用请求前回调函数
+    // 调用请求前回调函数
     _s.beforeSend(xhr);
     // 初始化请求
     xhr.open(_s.type, _s.url, _s.async);

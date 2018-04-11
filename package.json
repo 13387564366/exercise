@@ -19,6 +19,8 @@
   "homepage": "https://github.com/yanxiaojun617/exercise#readme",
   "devDependencies": {
     "babel-cli": "^6.26.0",
-    "babel-preset-env": "^1.6.1"
+    "babel-eslint": "^8.2.2",
+    "babel-preset-env": "^1.6.1",
+    "eslint-config-alloy": "^1.4.1"
   }
 }

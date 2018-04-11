@@ -72,7 +72,8 @@ const http = {
       _s.error(xhr, 408, e);
     });
     // 如果是"简单"请求,则把data参数组装在url上
-    let useUrlParam = false, sType = _s.type.toUpperCase();
+    let useUrlParam = false;
+    let sType = _s.type.toUpperCase();
     if (sType === 'GET' || sType === 'DELETE') {
       useUrlParam = true;
       _s.url = http.getQueryUrl(_s.url, _s.data);
@@ -99,7 +100,7 @@ const http = {
     }
     let paramsStr = data instanceof Object ? http.getQueryString(data) : data;
     if (paramsStr) {
-      url += (url.indexOf('?') !== -1) ? paramsStr : '?' + paramsStr
+      url += (url.indexOf('?') !== -1) ? paramsStr : '?' + paramsStr;
     }
     return url;
   },
@@ -124,7 +125,7 @@ const http = {
         let val = data[key];
         // todo 参数Date类型需要根据后台api酌情处理
         if (val instanceof Date) {
-          // val = dateFormat(val, 'yyyy-MM-dd hh:mm:ss')
+          val = dateFormat(val, 'yyyy-MM-dd hh:mm:ss');
         }
         paramsArr.push(encodeURIComponent(key) + '=' + encodeURIComponent(val));
       }
@@ -193,7 +194,7 @@ const http = {
       dataType: dataType,
       data: data,
       success: successCallback
-    })
+    });
   },
   delete: (url, data, successCallback, dataType = 'json') => {
     http.request({
@@ -202,7 +203,7 @@ const http = {
       dataType: dataType,
       data: data,
       success: successCallback
-    })
+    });
   },
   // 调用此方法,参数data应为查询字符串或普通对象
   post: (url, data, successCallback, dataType = 'json') => {
@@ -213,7 +214,7 @@ const http = {
       data: data,
       headers: {'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'},
       success: successCallback
-    })
+    });
   },
   // 调用此方法,参数data应为json字符串
   postBody: (url, data, successCallback, dataType = 'json') => {
@@ -224,7 +225,7 @@ const http = {
       data: data,
       headers: {'Content-Type': 'application/json; charset=UTF-8'},
       success: successCallback
-    })
+    });
   }
 };
 
@@ -233,19 +234,19 @@ Function.prototype.before = function (beforeFn) {
   return function () {
     beforeFn.apply(this, arguments);
     _self.apply(this, arguments);
-  }
+  };
 };
 Function.prototype.after = function (afterFn) {
   let _self = this;
   return function () {
     _self.apply(this, arguments);
     afterFn.apply(this, arguments);
-  }
+  };
 };
 
 // 日期格式化
 const dateFormat = (date, sFormat = 'yyyy-MM-dd') => {
-  if (!date instanceof Date) {
+  if (!(date instanceof Date)) {
     return;
   }
   let time = {
@@ -268,17 +269,17 @@ const dateFormat = (date, sFormat = 'yyyy-MM-dd') => {
   time.Year = date.getFullYear();
   time.TYear = String(time.Year).substr(2);
   time.Month = date.getMonth() + 1;
-  time.TMonth = time.Month < 10 ? "0" + time.Month : String(time.Month);
+  time.TMonth = time.Month < 10 ? '0' + time.Month : String(time.Month);
   time.Day = date.getDate();
-  time.TDay = time.Day < 10 ? "0" + time.Day : String(time.Day);
+  time.TDay = time.Day < 10 ? '0' + time.Day : String(time.Day);
   time.Hour = date.getHours();
-  time.THour = time.Hour < 10 ? "0" + time.Hour : String(time.Hour);
+  time.THour = time.Hour < 10 ? '0' + time.Hour : String(time.Hour);
   time.hour = time.Hour < 13 ? time.Hour : time.Hour - 12;
-  time.Thour = time.hour < 10 ? "0" + time.hour : String(time.hour);
+  time.Thour = time.hour < 10 ? '0' + time.hour : String(time.hour);
   time.Minute = date.getMinutes();
-  time.TMinute = time.Minute < 10 ? "0" + time.Minute : String(time.Minute);
+  time.TMinute = time.Minute < 10 ? '0' + time.Minute : String(time.Minute);
   time.Second = date.getSeconds();
-  time.TSecond = time.Second < 10 ? "0" + time.Second : String(time.Second);
+  time.TSecond = time.Second < 10 ? '0' + time.Second : String(time.Second);
   time.Millisecond = date.getMilliseconds();
 
   return sFormat.replace(/yyyy/ig, String(time.Year))
@@ -297,5 +298,5 @@ const dateFormat = (date, sFormat = 'yyyy-MM-dd') => {
     .replace(/m/g, String(time.Minute))
     .replace(/ss/ig, time.TSecond)
     .replace(/s/ig, String(time.Second))
-    .replace(/fff/ig, String(time.Millisecond))
+    .replace(/fff/ig, String(time.Millisecond));
 };
