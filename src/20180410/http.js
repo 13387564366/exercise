@@ -37,6 +37,10 @@ const http = {
     }
     // 创建XMLHttpRequest请求对象
     let xhr = new XMLHttpRequest();
+    // 请求开始回调函数
+    xhr.addEventListener('loadstart', e => {
+      _s.beforeSend(xhr);
+    });
     // 请求成功回调函数
     xhr.addEventListener('load', e => {
       const status = xhr.status;
@@ -54,27 +58,25 @@ const http = {
       } else {
         _s.error(xhr, status, e);
       }
-      _s.complete(xhr, status);
+    });
+    // 请求结束
+    xhr.addEventListener('loadend', e => {
+      _s.complete(xhr, xhr.status);
     });
     // 请求出错
     xhr.addEventListener('error', e => {
       _s.error(xhr, xhr.status, e);
-      _s.complete(xhr, xhr.status);
     });
     // 请求超时
     xhr.addEventListener('timeout', e => {
       _s.error(xhr, 408, e);
-      _s.complete(xhr, 408);
     });
-
     // 如果是"简单"请求,则把data参数组装在url上
     let useUrlParam = false, sType = _s.type.toUpperCase();
     if (sType === 'GET' || sType === 'DELETE') {
       useUrlParam = true;
       _s.url = http.getQueryUrl(_s.url, _s.data);
     }
-    //调用请求前回调函数
-    _s.beforeSend(xhr);
     // 初始化请求
     xhr.open(_s.type, _s.url, _s.async);
     // 设置期望的返回数据类型
@@ -83,7 +85,7 @@ const http = {
     for (const key of Object.keys(_s.headers)) {
       xhr.setRequestHeader(key, _s.headers[key]);
     }
-    // 监测超时
+    // 设置超时时间
     if (_s.async && _s.timeout) {
       xhr.timeout = _s.timeout;
     }
@@ -138,7 +140,7 @@ const http = {
       return key === headerKey;
     });
     if (!hasAuthorization) {
-      settings.headers[headerKey] = ''; // todo 从缓存中获取权限头
+      settings.headers[headerKey] = 'test'; // todo 从缓存中获取权限头
     }
   },
   /**
@@ -152,6 +154,9 @@ const http = {
       console.log('request error...');
       if (status === 401) {
         console.log('request 没有权限...');
+      }
+      if (status === 408) {
+        console.log('request timeout');
       }
     };
     // 使用before拦截参数的 beforeSend 回调函数
@@ -229,7 +234,6 @@ const http = {
       },
     })
   }
-
 };
 
 Function.prototype.before = function (beforeFn) {

@@ -17,20 +17,15 @@
 </div>
 <script src="http.js"></script>
 <script>
+
   document.getElementById('buttons').addEventListener('click', function (e) {
     let url = 'http://88.128.18.144:8081/api/v1/test/';
     const id = e.target.id;
     if (id === 'get') {
-      http.get(url + id + '?name=哈哈&age=12', null, (result) => {
-        debugger;
+      url = url + id;
+      http.get(url + '?name=哈哈&age=12', null, (result, status, xhr) => {
+        console.log('进行业务操作');
       });
-      /*http.request({
-        url: url + id + '?name=哈哈&age=12',
-        success: function (result, status, xhr) {
-          console.log(result, '\n status:', status, xhr);
-          debugger;
-        }
-      });*/
     }
     if (id === 'get_dataParam') {
       http.request({
@@ -48,8 +43,7 @@
         url: url + id,
         timeout: 1000,
         success: function (result, status, xhr) {
-          console.log(result, '\n status:', status, xhr);
-          debugger;
+          console.log('进行业务操作');
         }
       });
     }
@@ -73,22 +67,10 @@
       });
     }
     if (id === 'post_dataParam') {
-      http.post(url + id, {name: '哈哈', age: 12}, (result) => {
-        debugger;
+      url = url + id;
+      http.post(url, {name: '哈哈', age: 12}, (result, status, xhr) => {
+        console.log('进行业务操作');
       })
-      /*http.request({
-        url: url + id,
-        type: 'POST',
-        data: {name: '哈哈', age: 12},
-//                data: 'name=哈哈&age=12',
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'
-        },
-        success: function (result, status, xhr) {
-          console.log(result, '\n status:', status, xhr);
-          debugger;
-        }
-      });*/
     }
     if (id === 'post_formDataParam') {
       // 传 FormData 参数,不要设置contentType 为 multipart/form-data
@@ -106,19 +88,14 @@
       });
     }
     if (id === 'post_body') {
-      http.request({
-        url: url + id,
-        type: 'POST',
-        headers: {
-          'Content-Type': 'application/json; charset=UTF-8'
-        },
-        data: JSON.stringify({name: '哈哈', age: 12, birthday: dateFormat(new Date(), 'yyyy-MM-dd hh:mm:ss')}),
-        success: function (result, status, xhr) {
-          console.log(result, '\n status:', status, xhr);
-          debugger;
-        }
+      url = url + id;
+      http.postBody(url, JSON.stringify({
+        name: '哈哈',
+        age: 12,
+        birthday: dateFormat(new Date(), 'yyyy-MM-dd hh:mm:ss')
+      }), (result, status, xhr) => {
+        console.log('进行业务操作');
       });
-
     }
 
   })
