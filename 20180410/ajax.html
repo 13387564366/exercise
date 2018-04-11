@@ -15,107 +15,113 @@
     <button id="post_formDataParam">post_formDataParam</button>
     <button id="post_body">post_body</button>
 </div>
-<script src="ajax.js"></script>
+<script src="http.js"></script>
 <script>
-    document.getElementById('buttons').addEventListener('click', function (e) {
-        let url = 'http://88.128.18.144:8081/api/v1/test/';
-        const id = e.target.id;
-        if (id === 'get') {
-            request({
-                url: url + id + '?name=哈哈&age=12',
-                success: function (result, status, xhr) {
-                    console.log(result, '\n status:', status, xhr);
-                    debugger;
-                }
-            });
+  document.getElementById('buttons').addEventListener('click', function (e) {
+    let url = 'http://88.128.18.144:8081/api/v1/test/';
+    const id = e.target.id;
+    if (id === 'get') {
+      http.get(url + id + '?name=哈哈&age=12', null, (result) => {
+        debugger;
+      });
+      /*http.request({
+        url: url + id + '?name=哈哈&age=12',
+        success: function (result, status, xhr) {
+          console.log(result, '\n status:', status, xhr);
+          debugger;
         }
-        if (id === 'get_dataParam') {
-            request({
-                url: url + id,
-                data: {name: '哈哈', age: 12},
+      });*/
+    }
+    if (id === 'get_dataParam') {
+      http.request({
+        url: url + id,
+        data: {name: '哈哈', age: 12},
 //                data: 'name=哈哈&age=12',
-                success: function (result, status, xhr) {
-                    console.log(result, '\n status:', status, xhr);
-                    debugger;
-                }
-            });
+        success: function (result, status, xhr) {
+          console.log(result, '\n status:', status, xhr);
+          debugger;
         }
-        if (id === 'get_timeout') {
-            get({
-                url: url + id,
-                timeout: 1000,
-                success: function (result, status, xhr) {
-                    console.log(result, '\n status:', status, xhr);
-                    debugger;
-                }
-            });
+      });
+    }
+    if (id === 'get_timeout') {
+      get({
+        url: url + id,
+        timeout: 1000,
+        success: function (result, status, xhr) {
+          console.log(result, '\n status:', status, xhr);
+          debugger;
         }
-        if (id === 'get_document') {
-            request({
-                url: 'http://product.dn168.net/kit_file_server/',
-                dataType: 'document',
-                success: function (result, status, xhr) {
-                    console.log(result, '\n status:', status, xhr);
-                    debugger;
-                }
-            });
+      });
+    }
+    if (id === 'get_document') {
+      http.request({
+        url: 'http://product.dn168.net/kit_file_server/',
+        dataType: 'document',
+        success: function (result, status, xhr) {
+          console.log(result, '\n status:', status, xhr);
+          debugger;
         }
-        if (id === 'get_exception') {
-            request({
-                url: url + id,
-                success: function (result, status, xhr) {
-                    console.log(result, '\n status:', status, xhr);
-                    debugger;
-                }
-            });
+      });
+    }
+    if (id === 'get_exception') {
+      http.request({
+        url: url + id,
+        success: function (result, status, xhr) {
+          console.log(result, '\n status:', status, xhr);
+          debugger;
         }
-        if (id === 'post_dataParam') {
-            request({
-                url: url + id,
-                type: 'POST',
-                data: {name: '哈哈', age: 12},
+      });
+    }
+    if (id === 'post_dataParam') {
+      http.post(url + id, {name: '哈哈', age: 12}, (result) => {
+        debugger;
+      })
+      /*http.request({
+        url: url + id,
+        type: 'POST',
+        data: {name: '哈哈', age: 12},
 //                data: 'name=哈哈&age=12',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'
-                },
-                success: function (result, status, xhr) {
-                    console.log(result, '\n status:', status, xhr);
-                    debugger;
-                }
-            });
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'
+        },
+        success: function (result, status, xhr) {
+          console.log(result, '\n status:', status, xhr);
+          debugger;
         }
-        if (id === 'post_formDataParam') {
-            // 传 FormData 参数,不要设置contentType 为 multipart/form-data
-            let formData = new FormData();
-            formData.append('name', '哈哈');
-            formData.append('age', 123);
-            request({
-                url: url + id,
-                type: 'POST',
-                data: formData,
-                success: function (result, status, xhr) {
-                    console.log(result, '\n status:', status, xhr);
-                    debugger;
-                }
-            });
+      });*/
+    }
+    if (id === 'post_formDataParam') {
+      // 传 FormData 参数,不要设置contentType 为 multipart/form-data
+      let formData = new FormData();
+      formData.append('name', '哈哈');
+      formData.append('age', 123);
+      http.request({
+        url: url + id,
+        type: 'POST',
+        data: formData,
+        success: function (result, status, xhr) {
+          console.log(result, '\n status:', status, xhr);
+          debugger;
         }
-        if (id === 'post_body') {
-            request({
-                url: url + id,
-                type: 'POST',
-                headers: {
-                    'Content-Type': 'application/json; charset=UTF-8'
-                },
-                data: JSON.stringify({name: '哈哈', age: 12, birthday: dateFormat(new Date(), 'yyyy-MM-dd hh:mm:ss')}),
-                success: function (result, status, xhr) {
-                    console.log(result, '\n status:', status, xhr);
-                    debugger;
-                }
-            });
+      });
+    }
+    if (id === 'post_body') {
+      http.request({
+        url: url + id,
+        type: 'POST',
+        headers: {
+          'Content-Type': 'application/json; charset=UTF-8'
+        },
+        data: JSON.stringify({name: '哈哈', age: 12, birthday: dateFormat(new Date(), 'yyyy-MM-dd hh:mm:ss')}),
+        success: function (result, status, xhr) {
+          console.log(result, '\n status:', status, xhr);
+          debugger;
+        }
+      });
 
-        }
+    }
 
-    })
+  })
 </script>
 </body>
 </html>
