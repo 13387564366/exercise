@@ -20,7 +20,7 @@ const http = {
       async: true, //  boolean true:异步请求 false:同步请求 required
       data: null, // any 请求参数,data需要和请求头Content-Type对应
       headers: {}, // object 请求头
-      timeout: 0, // string 超时时间:0表示不设置超时
+      timeout: 1000, // string 超时时间:0表示不设置超时
       beforeSend: (xhr) => {
       },
       success: (result, status, xhr) => {
@@ -89,7 +89,7 @@ const http = {
     if (_s.async && _s.timeout) {
       xhr.timeout = _s.timeout;
     }
-    // 发送请求.如果是简单请求,请求提应为null.否则,请求体类型需要和请求头Content-Type对应
+    // 发送请求.如果是简单请求,请求参数应为null.否则,请求参数类型需要和请求头Content-Type对应
     xhr.send(useUrlParam ? null : http.getQueryData(_s.data));
   },
   // 把data参数拼装在url上
@@ -134,13 +134,13 @@ const http = {
   // 添加权限请求头
   addAuthorizationHeader: (settings) => {
     settings.headers = settings.headers || {};
-    const headerKey = 'Authorization';
+    const headerKey = 'Authorization'; // todo 权限头名称
     // 判断是否已经存在权限header
     let hasAuthorization = Object.keys(settings.headers).some(key => {
       return key === headerKey;
     });
     if (!hasAuthorization) {
-      settings.headers[headerKey] = 'test'; // todo 从缓存中获取权限头
+      settings.headers[headerKey] = 'test'; // todo 从缓存中获取headerKey的值
     }
   },
   /**
@@ -183,7 +183,7 @@ const http = {
     }).after((xhr, status) => {
       console.log('request hide loading...');
     });
-    // 请求添加权限头
+    // 请求添加权限头,然后调用http.ajax方法
     (http.ajax.before(http.addAuthorizationHeader))(settings);
   },
   get: (url, data, successCallback, dataType = 'json') => {
@@ -192,9 +192,7 @@ const http = {
       type: 'GET',
       dataType: dataType,
       data: data,
-      success: (result, status, xhr) => {
-        successCallback && successCallback(result, status, xhr);
-      },
+      success: successCallback
     })
   },
   delete: (url, data, successCallback, dataType = 'json') => {
@@ -203,9 +201,7 @@ const http = {
       type: 'DELETE',
       dataType: dataType,
       data: data,
-      success: (result, status, xhr) => {
-        successCallback && successCallback(result, status, xhr);
-      },
+      success: successCallback
     })
   },
   // 调用此方法,参数data应为查询字符串或普通对象
@@ -216,9 +212,7 @@ const http = {
       dataType: dataType,
       data: data,
       headers: {'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'},
-      success: (result, status, xhr) => {
-        successCallback && successCallback(result, status, xhr);
-      },
+      success: successCallback
     })
   },
   // 调用此方法,参数data应为json字符串
@@ -229,9 +223,7 @@ const http = {
       dataType: dataType,
       data: data,
       headers: {'Content-Type': 'application/json; charset=UTF-8'},
-      success: (result, status, xhr) => {
-        successCallback && successCallback(result, status, xhr);
-      },
+      success: successCallback
     })
   }
 };

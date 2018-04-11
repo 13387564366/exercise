@@ -84,7 +84,7 @@ const http = {
         xhr.abort();
       }, _s.timeout);
     }
-    // 发送请求.如果是简单请求,请求提应为null.否则,请求体类型需要和请求头Content-Type对应
+    // 发送请求.如果是简单请求,请求参数应为null.否则,请求参数类型需要和请求头Content-Type对应
     xhr.send(useUrlParam ? null : http.getQueryData(_s.data));
   },
   // 把data参数拼装在url上

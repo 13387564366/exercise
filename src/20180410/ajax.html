@@ -41,10 +41,7 @@
     if (id === 'get_timeout') {
       http.request({
         url: url + id,
-        timeout: 1000,
-        success: function (result, status, xhr) {
-          console.log('进行业务操作');
-        }
+        timeout: 1000
       });
     }
     if (id === 'get_document') {
@@ -58,13 +55,7 @@
       });
     }
     if (id === 'get_exception') {
-      http.request({
-        url: url + id,
-        success: function (result, status, xhr) {
-          console.log(result, '\n status:', status, xhr);
-          debugger;
-        }
-      });
+      http.get(url + id);
     }
     if (id === 'post_dataParam') {
       url = url + id;
