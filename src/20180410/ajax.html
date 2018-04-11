@@ -44,7 +44,7 @@
       });
     }
     if (id === 'get_timeout') {
-      get({
+      http.request({
         url: url + id,
         timeout: 1000,
         success: function (result, status, xhr) {
