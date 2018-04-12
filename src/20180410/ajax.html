@@ -14,9 +14,36 @@
     <button id="post_dataParam">post_dataParam</button>
     <button id="post_formDataParam">post_formDataParam</button>
     <button id="post_body">post_body</button>
+    <button id="post_body_list">post_body_list</button>
+</div>
+<br>
+<div>
+    <label for="file">选择文件,可多选:</label>
+    <input id="file" type="file" multiple>
+    <button id="upload">upload</button>
 </div>
 <script src="http.js"></script>
 <script>
+  document.getElementById('upload').addEventListener('click', function () {
+    let files = document.getElementById('file').files;
+    if (files.length === 0) {
+      console.log('没有选择文件');
+      return;
+    }
+    let form = new FormData(); // FormData 对象
+    Array.from(files).forEach((file, index) => {
+      form.append(index, file); // 文件对象
+    });
+    http.ajax({
+      url: 'http://88.128.18.144:3333/upload?directory=test',
+      type: 'POST',
+      data: form,
+      success: function (result, status, xhr) {
+        console.log('文件上传成功', result.data);
+      }
+    });
+  });
+
 
   document.getElementById('buttons').addEventListener('click', function (e) {
     let url = 'http://88.128.18.144:8081/api/v1/test/';
@@ -45,8 +72,9 @@
       });
     }
     if (id === 'get_document') {
-      http.request({
-        url: 'http://product.dn168.net/kit_file_server/',
+      // http.request是针对这个api(http://88.128.18.144:8081/api/)封装的,这里请求另外一个接口,不能使用http.request
+      http.ajax({
+        url: 'http://172.16.19.136:9000/kit_file_server/',
         dataType: 'document',
         success: function (result, status, xhr) {
           console.log(result, '\n status:', status, xhr);
@@ -73,8 +101,7 @@
         type: 'POST',
         data: formData,
         success: function (result, status, xhr) {
-          console.log(result, '\n status:', status, xhr);
-          debugger;
+          console.log('进行业务操作');
         }
       });
     }
@@ -83,8 +110,15 @@
       http.postBody(url, JSON.stringify({
         name: '哈哈',
         age: 12,
-        birthday: dateFormat(new Date(), 'yyyy-MM-dd hh:mm:ss')
+        birthday: dateFormat(new Date(), 'yyyy-MM-dd hh:mm:ss'),
+        hobbies: ['a', 'b', 'c']
       }), (result, status, xhr) => {
+        console.log('进行业务操作');
+      });
+    }
+    if (id === 'post_body_list') {
+      url = url + id;
+      http.postBody(url, JSON.stringify(['a', 'b', 'c']), (result, status, xhr) => {
         console.log('进行业务操作');
       });
     }

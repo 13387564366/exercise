@@ -123,7 +123,7 @@ const http = {
         let val = data[key];
         // todo 参数Date类型需要根据后台api酌情处理
         if (val instanceof Date) {
-          // val = dateFormat(val, 'yyyy-MM-dd hh:mm:ss');
+          val = dateFormat(val, 'yyyy-MM-dd hh:mm:ss');
         }
         paramsArr.push(encodeURIComponent(key) + '=' + encodeURIComponent(val));
       });
@@ -155,7 +155,7 @@ const http = {
     let successFn = settings.success;
     // 覆盖参数success回调函数
     settings.success = (result, status, xhr) => {
-      // todo 根据后台api判断是否请求成功
+      // todo 根据后台接口api判断是否请求成功
       if (result && result instanceof Object && result.code !== 1) {
         errorHandle(xhr, status);
       } else {
