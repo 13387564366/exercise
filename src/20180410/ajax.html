@@ -64,10 +64,10 @@
       })
     }
     if (id === 'post_formDataParam') {
-      // 传 FormData 参数,不要设置contentType 为 multipart/form-data
+      // 传FormData类型参数,不要设置contentType,浏览器会自动设置contentType为'multipart/form-data'
       let formData = new FormData();
       formData.append('name', '哈哈');
-      formData.append('age', 123);
+      formData.append('age', '123');
       http.request({
         url: url + id,
         type: 'POST',

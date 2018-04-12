@@ -66,9 +66,10 @@ const http = {
     // 如果是"简单"请求,则把data参数组装在url上
     let useUrlParam = false;
     let sType = _s.type.toUpperCase();
+    // 如果是"简单"请求,则把data参数组装在url上
     if (sType === 'GET' || sType === 'DELETE') {
       useUrlParam = true;
-      _s.url = http.getQueryUrl(_s.url, _s.data);
+      _s.url += http.getUrlParam(_s.url, _s.data);
     }
     // 调用请求前回调函数
     _s.beforeSend(xhr);
@@ -90,16 +91,13 @@ const http = {
     // 发送请求.如果是简单请求,请求参数应为null.否则,请求参数类型需要和请求头Content-Type对应
     xhr.send(useUrlParam ? null : http.getQueryData(_s.data));
   },
-  // 把data参数拼装在url上
-  getQueryUrl: (url, data) => {
+  // 把参数data转为url查询参数
+  getUrlParam: (url, data) => {
     if (!data) {
-      return url;
+      return '';
     }
     let paramsStr = data instanceof Object ? http.getQueryString(data) : data;
-    if (paramsStr) {
-      url += (url.indexOf('?') !== -1) ? paramsStr : '?' + paramsStr
-    }
-    return url;
+    return (url.indexOf('?') !== -1) ? paramsStr : '?' + paramsStr;
   },
   // 获取ajax请求参数
   getQueryData: (data) => {
@@ -118,14 +116,14 @@ const http = {
   getQueryString: (data) => {
     let paramsArr = [];
     if (data instanceof Object) {
-      for (const key in data) {
+      Object.keys(data).forEach(key => {
         let val = data[key];
         // todo 参数Date类型需要根据后台api酌情处理
         if (val instanceof Date) {
-          // val = dateFormat(val, 'yyyy-MM-dd hh:mm:ss')
+          // val = dateFormat(val, 'yyyy-MM-dd hh:mm:ss');
         }
         paramsArr.push(encodeURIComponent(key) + '=' + encodeURIComponent(val));
-      }
+      });
     }
     return paramsArr.join('&');
   }

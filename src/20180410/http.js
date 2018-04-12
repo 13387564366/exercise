@@ -4,7 +4,8 @@ const http = {
    * >>使用new XMLHttpRequest 创建请求对象,所以不考虑低端IE浏览器(IE6及以下不支持XMLHttpRequest)
    * >>使用es6语法,如果需要在正式环境使用,则可以用babel转换为es5语法 https://babeljs.cn/docs/setup/#installation
    *
-   * @param settings 请求参数,其中data需要和请求头Content-Type对应
+   * @param settings 请求参数模仿jQuery ajax
+   * 调用该方法,data参数需要和请求头Content-Type对应
    *  Content-Type                        data                                     描述
    *  application/x-www-form-urlencoded   'name=哈哈&age=12'或{name:'哈哈',age:12}  查询字符串,用&分割
    *  application/json                     name=哈哈&age=12'                        json字符串
@@ -71,12 +72,12 @@ const http = {
     xhr.addEventListener('timeout', e => {
       _s.error(xhr, 408, e);
     });
-    // 如果是"简单"请求,则把data参数组装在url上
     let useUrlParam = false;
     let sType = _s.type.toUpperCase();
+    // 如果是"简单"请求,则把data参数组装在url上
     if (sType === 'GET' || sType === 'DELETE') {
       useUrlParam = true;
-      _s.url = http.getQueryUrl(_s.url, _s.data);
+      _s.url += http.getUrlParam(_s.url, _s.data);
     }
     // 初始化请求
     xhr.open(_s.type, _s.url, _s.async);
@@ -93,16 +94,13 @@ const http = {
     // 发送请求.如果是简单请求,请求参数应为null.否则,请求参数类型需要和请求头Content-Type对应
     xhr.send(useUrlParam ? null : http.getQueryData(_s.data));
   },
-  // 把data参数拼装在url上
-  getQueryUrl: (url, data) => {
+  // 把参数data转为url查询参数
+  getUrlParam: (url, data) => {
     if (!data) {
-      return url;
+      return '';
     }
     let paramsStr = data instanceof Object ? http.getQueryString(data) : data;
-    if (paramsStr) {
-      url += (url.indexOf('?') !== -1) ? paramsStr : '?' + paramsStr;
-    }
-    return url;
+    return (url.indexOf('?') !== -1) ? paramsStr : '?' + paramsStr;
   },
   // 获取ajax请求参数
   getQueryData: (data) => {
@@ -121,28 +119,16 @@ const http = {
   getQueryString: (data) => {
     let paramsArr = [];
     if (data instanceof Object) {
-      for (const key in data) {
+      Object.keys(data).forEach(key => {
         let val = data[key];
         // todo 参数Date类型需要根据后台api酌情处理
         if (val instanceof Date) {
-          val = dateFormat(val, 'yyyy-MM-dd hh:mm:ss');
+          // val = dateFormat(val, 'yyyy-MM-dd hh:mm:ss');
         }
         paramsArr.push(encodeURIComponent(key) + '=' + encodeURIComponent(val));
-      }
+      });
     }
     return paramsArr.join('&');
-  },
-  // 添加权限请求头
-  addAuthorizationHeader: (settings) => {
-    settings.headers = settings.headers || {};
-    const headerKey = 'Authorization'; // todo 权限头名称
-    // 判断是否已经存在权限header
-    let hasAuthorization = Object.keys(settings.headers).some(key => {
-      return key === headerKey;
-    });
-    if (!hasAuthorization) {
-      settings.headers[headerKey] = 'test'; // todo 从缓存中获取headerKey的值
-    }
   },
   /**
    * 根据实际业务情况装饰 ajax 方法
@@ -165,15 +151,18 @@ const http = {
     }).before(xhr => {
       console.log('request show loading...');
     });
-    // 拦截参数的 success
-    settings.success = (settings.success || function () {
-    }).before((result, status, xhr) => {
-      console.log('request success...');
+    // 保存参数success回调函数
+    let successFn = settings.success;
+    // 覆盖参数success回调函数
+    settings.success = (result, status, xhr) => {
       // todo 根据后台api判断是否请求成功
       if (result && result instanceof Object && result.code !== 1) {
         errorHandle(xhr, status);
+      } else {
+        console.log('request success');
+        successFn && successFn(result, status, xhr);
       }
-    });
+    };
     // 拦截参数的 error
     settings.error = (settings.error || function () {
     }).before((result, status, xhr) => {
@@ -186,6 +175,18 @@ const http = {
     });
     // 请求添加权限头,然后调用http.ajax方法
     (http.ajax.before(http.addAuthorizationHeader))(settings);
+  },
+  // 添加权限请求头
+  addAuthorizationHeader: (settings) => {
+    settings.headers = settings.headers || {};
+    const headerKey = 'Authorization'; // todo 权限头名称
+    // 判断是否已经存在权限header
+    let hasAuthorization = Object.keys(settings.headers).some(key => {
+      return key === headerKey;
+    });
+    if (!hasAuthorization) {
+      settings.headers[headerKey] = 'test'; // todo 从缓存中获取headerKey的值
+    }
   },
   get: (url, data, successCallback, dataType = 'json') => {
     http.request({
@@ -212,7 +213,9 @@ const http = {
       type: 'POST',
       dataType: dataType,
       data: data,
-      headers: {'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'},
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'
+      },
       success: successCallback
     });
   },
@@ -223,20 +226,23 @@ const http = {
       type: 'POST',
       dataType: dataType,
       data: data,
-      headers: {'Content-Type': 'application/json; charset=UTF-8'},
+      headers: {
+        'Content-Type': 'application/json; charset=UTF-8'
+      },
       success: successCallback
     });
   }
 };
 
-Function.prototype.before = function (beforeFn) {
+Function.prototype.before = function (beforeFn) { // eslint-disable-line
   let _self = this;
   return function () {
     beforeFn.apply(this, arguments);
     _self.apply(this, arguments);
   };
 };
-Function.prototype.after = function (afterFn) {
+
+Function.prototype.after = function (afterFn) { // eslint-disable-line
   let _self = this;
   return function () {
     _self.apply(this, arguments);
