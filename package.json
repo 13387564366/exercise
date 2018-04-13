@@ -4,7 +4,7 @@
   "description": "",
   "main": "",
   "scripts": {
-    "build": "babel src -d lib",
+    "build": "babel src -d lib/es5",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
