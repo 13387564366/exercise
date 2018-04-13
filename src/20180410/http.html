@@ -22,8 +22,39 @@
     <input id="file" type="file" multiple>
     <button id="upload">upload</button>
 </div>
+<br>
+<div>
+    <label for="file">文件分块传输:</label>
+    <input id="bidFile" type="file">
+    <button id="uploadFile">uploadFile</button>
+</div>
 <script src="http.js"></script>
 <script>
+  const LENGTH = 1024 * 100; // 100kb
+  document.getElementById('uploadFile').addEventListener('click', function () {
+    let file = document.getElementById('bidFile').files[0];
+    if (!file) {
+      console.log('没有选择文件');
+      return;
+    }
+    let start = 0, end = LENGTH;
+    while (start < file.size) {
+      let blob = file.slice(start, end);
+      let form = new FormData();
+      form.append('blob', blob);
+      http.ajax({
+        url: 'http://88.128.18.144:3333/upload?directory=test',
+        type: 'POST',
+        data: form,
+        success: function (result, status, xhr) {
+          console.log('文件分块上传', result.data);
+        }
+      });
+      start = end;
+      end = start + LENGTH;
+    }
+  });
+
   document.getElementById('upload').addEventListener('click', function () {
     let files = document.getElementById('file').files;
     if (files.length === 0) {
