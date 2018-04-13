@@ -30,66 +30,20 @@
 </div>
 <script src="http.js"></script>
 <script>
-  const LENGTH = 1024 * 100; // 100kb
-  document.getElementById('uploadFile').addEventListener('click', function () {
-    let file = document.getElementById('bidFile').files[0];
-    if (!file) {
-      console.log('没有选择文件');
-      return;
-    }
-    let start = 0, end = LENGTH;
-    while (start < file.size) {
-      let blob = file.slice(start, end);
-      let form = new FormData();
-      form.append('blob', blob);
-      http.ajax({
-        url: 'http://88.128.18.144:3333/upload?directory=test',
-        type: 'POST',
-        data: form,
-        success: function (result, status, xhr) {
-          console.log('文件分块上传', result.data);
-        }
-      });
-      start = end;
-      end = start + LENGTH;
-    }
-  });
-
-  document.getElementById('upload').addEventListener('click', function () {
-    let files = document.getElementById('file').files;
-    if (files.length === 0) {
-      console.log('没有选择文件');
-      return;
-    }
-    let form = new FormData(); // FormData 对象
-    Array.from(files).forEach((file, index) => {
-      form.append(index, file); // 文件对象
-    });
-    http.ajax({
-      url: 'http://88.128.18.144:3333/upload?directory=test',
-      type: 'POST',
-      data: form,
-      success: function (result, status, xhr) {
-        console.log('文件上传成功', result.data);
-      }
-    });
-  });
-
 
   document.getElementById('buttons').addEventListener('click', function (e) {
     let url = 'http://88.128.18.144:8081/api/v1/test/';
     const id = e.target.id;
     if (id === 'get') {
       url = url + id;
-      http.get(url + '?name=哈哈&age=12', null, (result, status, xhr) => {
-        console.log('进行业务操作');
+      fetch(url + '?name=哈哈&age=12').then(res => res.json()).then(data => {
+        console.log(data);
       });
     }
     if (id === 'get_dataParam') {
       http.request({
         url: url + id,
-        data: {name: '哈哈', age: 12},
-//                data: 'name=哈哈&age=12',
+        data: {name: '哈哈', age: 12}, //data: 'name=哈哈&age=12',
         success: function (result, status, xhr) {
           console.log(result, '\n status:', status, xhr);
           debugger;
@@ -153,8 +107,53 @@
         console.log('进行业务操作');
       });
     }
+  });
 
-  })
+
+  document.getElementById('upload').addEventListener('click', function () {
+    let files = document.getElementById('file').files;
+    if (files.length === 0) {
+      console.log('没有选择文件');
+      return;
+    }
+    let form = new FormData(); // FormData 对象
+    Array.from(files).forEach((file, index) => {
+      form.append(index, file); // 文件对象
+    });
+    http.ajax({
+      url: 'http://88.128.18.144:3333/upload?directory=test',
+      type: 'POST',
+      data: form,
+      success: function (result, status, xhr) {
+        console.log('文件上传成功', result.data);
+      }
+    });
+  });
+
+  const LENGTH = 1024 * 100; // 100kb
+  document.getElementById('uploadFile').addEventListener('click', function () {
+    let file = document.getElementById('bidFile').files[0];
+    if (!file) {
+      console.log('没有选择文件');
+      return;
+    }
+    let start = 0, end = LENGTH;
+    while (start < file.size) {
+      let blob = file.slice(start, end);
+      let form = new FormData();
+      form.append('blob', blob);
+      http.ajax({
+        url: 'http://88.128.18.144:3333/upload?directory=test',
+        type: 'POST',
+        data: form,
+        success: function (result, status, xhr) {
+          console.log('文件分块上传', result.data);
+        }
+      });
+      start = end;
+      end = start + LENGTH;
+    }
+  });
 </script>
 </body>
 </html>
