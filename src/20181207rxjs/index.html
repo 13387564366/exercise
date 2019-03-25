@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="https://cdn.bootcss.com/rxjs/5.5.12/Rx.js"></script>
+    <script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.min.js"></script>
+</head>
+<body>
+<button class="refresh">刷新</button>
+
+<script>
+
+    Rx.Observable.of(1, 2, 3).map(num => num * num).subscribe(num => {
+        console.log(num);
+    });
+    debugger;
+    let refreshDom = document.querySelector('.refresh');
+    let refreshClickStream = Rx.Observable.fromEvent(refreshDom, 'click');
+    refreshClickStream.startWith('startup click').map(function () {
+        var randomOffset = Math.floor(Math.random() * 500);
+        return 'https://api.github.com/users?since=' + randomOffset;
+    }).flatMap(requestUrl => {
+        return Rx.Observable.fromPromise($.getJSON(requestUrl));
+    }).subscribe(users => {
+        console.log(users.length);
+    })
+
+</script>
+</body>
+</html>

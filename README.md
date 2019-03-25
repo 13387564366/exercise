@@ -1,7 +1,7 @@
 # 测试,练习,代码片段
 
-// http://www.browsersync.cn/#install
-npm install -g browser-sync
 
-
-browser-sync start --server --files "src/**/*.css,src/**/*.html,src/**/*.js"
+* 全局安装[browser-sync](http://www.browsersync.cn/#install)
+`npm install -g browser-sync`
+* 运行
+`npm run start`

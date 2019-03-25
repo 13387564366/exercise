@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <style>
+        .box {
+            width: 400px;
+            height: 300px;
+            background: #E95546;
+        }
+
+        .ripple {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.4);
+            -webkit-transform: scale(0);
+            -ms-transform: scale(0);
+            transform: scale(0);
+            position: absolute;
+            opacity: 1;
+            animation: rippleAnimation .4s linear;
+        }
+
+        @keyframes rippleAnimation {
+            100% {
+                -webkit-transform: scale(2);
+                transform: scale(2);
+                opacity: 0;
+            }
+        }
+
+    </style>
+
+</head>
+<body>
+<div class="box" id="box">
+
+</div>
+<script>
+    let box = document.getElementById('box');
+    box.onclick = function (e) {
+        let animationDom = document.getElementsByClassName('ripple')[0];
+        if(animationDom){
+            animationDom.parentNode.removeChild(animationDom);
+        }
+        let spanDom = document.createElement('span');
+        spanDom.className = 'ripple rippleEffect';
+        spanDom.style.left = (e.x - 25) + 'px';
+        spanDom.style.top = (e.y - 25) + 'px';
+        box.appendChild(spanDom);
+    }
+</script>
+</body>
+</html>
