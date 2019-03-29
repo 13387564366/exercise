@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- leaflet -->
+    <link href="./leaflet@1.4.0/leaflet.css" rel="stylesheet">
+    <script src="./leaflet@1.4.0/leaflet.js"></script>
+    <script src="./esri-leaflet@2.2.4/esri-leaflet.js"></script>
+    <!-- 中国地图插件 -->
+    <script src="./leaflet.ChineseTmsProviders/leaflet.ChineseTmsProviders.js"></script>
+    <!-- 点聚合插件 -->
+    <link href="./leaflet.markercluster/MarkerCluster.Default.css" rel="stylesheet">
+    <script src="./leaflet.markercluster/leaflet.markercluster.js"></script>
+    <script src="./leaflet.markercluster/esri-leaflet-cluster.js"></script>
+
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+        }
+
+        #map {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            right: 0;
+            left: 0;
+        }
+    </style>
+</head>
+<body>
+
+<div id="map"></div>
+<script>
+
+    /**
+     * 智图地图内容
+     */
+    var normalm1 = L.tileLayer.chinaProvider('Geoq.Normal.Map', {
+        maxZoom: 18,
+        minZoom: 5
+    });
+    var normalm3 = L.tileLayer.chinaProvider('Geoq.Normal.PurplishBlue', {
+        maxZoom: 18,
+        minZoom: 5
+    });
+    /**
+     * 天地图内容
+     */
+    var normalm = L.tileLayer.chinaProvider('TianDiTu.Normal.Map', {
+            maxZoom: 18,
+            minZoom: 5
+        }),
+        normala = L.tileLayer.chinaProvider('TianDiTu.Normal.Annotion', {
+            maxZoom: 18,
+            minZoom: 5
+        }),
+        imgm = L.tileLayer.chinaProvider('TianDiTu.Satellite.Map', {
+            maxZoom: 18,
+            minZoom: 5
+        }),
+        imga = L.tileLayer.chinaProvider('TianDiTu.Satellite.Annotion', {
+            maxZoom: 18,
+            minZoom: 5
+        });
+
+    var normal = L.layerGroup([normalm, normala]),
+        image = L.layerGroup([imgm, imga]);
+    /**
+     * 谷歌
+     */
+    var normalMap = L.tileLayer.chinaProvider('Google.Normal.Map', {
+            maxZoom: 18,
+            minZoom: 5
+        }),
+        satelliteMap = L.tileLayer.chinaProvider('Google.Satellite.Map', {
+            maxZoom: 18,
+            minZoom: 5
+        });
+    /**
+     * 高德地图
+     */
+    var Gaode = L.tileLayer.chinaProvider('GaoDe.Normal.Map', {
+        maxZoom: 18,
+        minZoom: 5
+    });
+    var Gaodimgem = L.tileLayer.chinaProvider('GaoDe.Satellite.Map', {
+        maxZoom: 18,
+        minZoom: 5
+    });
+    var Gaodimga = L.tileLayer.chinaProvider('GaoDe.Satellite.Annotion', {
+        maxZoom: 18,
+        minZoom: 5
+    });
+    var Gaodimage = L.layerGroup([Gaodimgem, Gaodimga]);
+
+
+    var Gray = L.esri.basemapLayer('Gray');
+    var DarkGray = L.esri.basemapLayer('DarkGray');
+    var Topographic = L.esri.basemapLayer('Topographic');
+    var Streets = L.esri.basemapLayer('Topographic');
+    var NationalGeographic = L.esri.basemapLayer('NationalGeographic');
+    var baseLayers = {
+        "Gray": Gray,
+        "DarkGray": DarkGray,
+        "Topographic": Topographic,
+        "Streets": Streets,
+        "NationalGeographic": NationalGeographic,
+        "智图地图": normalm1,
+        "智图午夜蓝": normalm3,
+        "天地图": normal,
+        "天地图影像": image,
+        "谷歌地图": normalMap,
+        "谷歌影像": satelliteMap,
+        "高德地图": Gaode,
+        "高德影像": Gaodimage,
+    };
+
+
+    var latLng = [45.526, -122.667]; // 美国
+    // var latLng = [23.119293, 113.321206]; // 广州
+    var map = L.map("map", {
+        center: latLng,
+        zoom: 14,
+        minZoom: 5,
+        maxZoom: 16,
+        layers: [Gray],
+    });
+
+    // 地图底图
+    // L.esri.basemapLayer('Gray').addTo(map);
+
+    L.control.layers(baseLayers, null).addTo(map);
+
+    // 面
+    L.esri.featureLayer({
+        url: 'https://services.arcgis.com/P3ePLMYs2RVChkJx/arcgis/rest/services/USA_Congressional_Districts/FeatureServer/0',
+        simplifyFactor: 0.5,
+        precision: 5,
+        style: function (feature) {
+            if (feature.properties.PARTY === 'Democrat') {
+                return { color: 'blue', weight: 2 };
+            } else if (feature.properties.PARTY === 'Republican') {
+                return { color: 'red', weight: 2 };
+            } else {
+                return { color: 'white', weight: 2 };
+            }
+        }
+    }).addTo(map);
+
+    // 线
+    var bikePaths = L.esri.featureLayer({
+        url: 'https://services.arcgis.com/uCXeTVveQzP4IIcx/ArcGIS/rest/services/Bike_Routes/FeatureServer/0',
+        style: function (feature) {
+            var c, o = 0.75;
+            switch (feature.properties.BIKEMODE) {
+                case 'Low traffic through street':
+                    c = '#007D7D';
+                    break;
+                case 'Bike boulevard':
+                    c = '#00FF3C';
+                    break;
+                case 'Caution area':
+                    c = '#FF0000';
+                    break;
+                case 'Local multi-use path':
+                    c = '#00BEFF';
+                    break;
+                case 'Regional multi-use path':
+                    c = '#b1a9d0';
+                    break;
+                case 'Moderate traffic through street':
+                    c = '#FFEB00';
+                    break;
+                case 'Planned multi-use path':
+                    c = '#000000';
+                    break;
+                case 'Bike lane':
+                    c = '#328000';
+                    o = '0.70';
+                    break;
+                case 'High traffic through street':
+                    c = '#FFA500';
+                    break;
+                case 'Planned bike lane':
+                    c = '#000000';
+                    o = '1.0';
+                    break;
+                default:
+                    c = '#C0C0C0';
+            }
+            return { color: c, opacity: o, weight: 5 };
+        }
+    }).addTo(map);
+
+
+    // 点
+    /*     L.esri.featureLayer({
+             url: 'https://services.arcgis.com/rOo16HdIMeOBI4Mb/arcgis/rest/services/Trimet_Transit_Stops/FeatureServer/0'
+         }).addTo(map);*/
+
+    // 使用点聚合插件加载点
+    L.esri.Cluster.featureLayer({
+        url: 'https://services.arcgis.com/rOo16HdIMeOBI4Mb/arcgis/rest/services/Trimet_Transit_Stops/FeatureServer/0'
+    }).addTo(map);
+
+</script>
+
+</body>
+</html>

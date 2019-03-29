@@ -8,15 +8,20 @@
     <script src="./leaflet@1.4.0/leaflet.js"></script>
     <script src="./esri-leaflet@2.2.4/esri-leaflet.js"></script>
     <script src="./leaflet.ChineseTmsProviders/leaflet.ChineseTmsProviders.js"></script>
+    <!-- 点聚合插件 -->
+    <link href="./leaflet.markercluster/MarkerCluster.Default.css" rel="stylesheet">
+    <script src="./leaflet.markercluster/leaflet.markercluster.js"></script>
+    <script src="./leaflet.markercluster/esri-leaflet-cluster.js"></script>
     <style>
         #map {
             width: 800px;
-            height: 500px;
+            height: 700px;
         }
     </style>
 </head>
 <body>
 <div id="map"></div>
+<script src="gzFeature.js"></script>
 <script>
     /**
      * 智图地图内容
@@ -80,6 +85,8 @@
     var Gaodimage = L.layerGroup([Gaodimgem, Gaodimga]);
 
 
+    // var latLng = [45.526, -122.667]; // 美国
+    var latLng = [23.29856015, 113.478382568]; // 广州
     var baseLayers = {
         "智图地图": normalm1,
         "智图午夜蓝": normalm3,
@@ -92,17 +99,70 @@
     };
 
     var map = L.map("map", {
-        center: [23.119733, 113.351154],
-        zoom: 12,
-        layers: [normalm3],
-        zoomControl: false
+        center: latLng,
+        zoom: 10,
+        minZoom: 5,
+        maxZoom: 16,
+        layers: [normalm3]
     });
 
     L.control.layers(baseLayers, null).addTo(map);
-    L.control.zoom({
-        zoomInTitle: '放大',
-        zoomOutTitle: '缩小'
+
+    function style(feature) {
+        return {
+            color: '#3182bd', //线颜色
+            opacity: 0.7, //线透明度
+            weight: 2, //线宽
+            fillColor: '#3182bd',
+            fillOpacity: 0.1
+        };
+    }
+
+    function highlightFeature(e) {
+        var layer = e.target;
+
+        layer.setStyle({
+            color: '#519cd2', //线颜色
+            opacity: 1, //线透明度
+            weight: 4, //线宽
+            fillColor: '#3182bd',
+            fillOpacity: 0.5
+        });
+
+        if (!L.Browser.ie && !L.Browser.opera && !L.Browser.edge) {
+            layer.bringToFront();
+        }
+    }
+
+    function resetHighlight(e) {
+        geojson.resetStyle(e.target);
+    }
+
+    function zoomToFeature(e) {
+        map.fitBounds(e.target.getBounds());
+    }
+
+    function onEachFeature(feature, layer) {
+        layer.on({
+            mouseover: highlightFeature,
+            mouseout: resetHighlight,
+            click: zoomToFeature
+        });
+    }
+
+    var geojson = L.geoJson(gzFeature, {
+        style: style,
+        onEachFeature: onEachFeature
     }).addTo(map);
+
+    var markers = L.markerClusterGroup();
+    for (var i = 0; i < 1000; i++) {
+        var lat = latLng[0] + Math.random() / 2 * (Math.random() > 0.5 ? -1 : 1);
+        var lng = latLng[1] + Math.random() / 2 * (Math.random() > 0.5 ? -1 : 1);
+        var marker = L.marker([lat, lng]);
+        markers.addLayer(marker);
+    }
+    map.addLayer(markers);
 </script>
 </body>
 </html>
