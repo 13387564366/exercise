@@ -1,0 +1,89 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- leaflet -->
+    <link href="./leaflet@1.4.0/leaflet.css" rel="stylesheet">
+    <script src="./leaflet@1.4.0/leaflet.js"></script>
+    <!--<script src="./esri-leaflet@2.2.4/esri-leaflet.js"></script>-->
+    <script src="./esri-leaflet-v2.2.4/dist/esri-leaflet-debug.js"></script>
+
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+        }
+
+        #map {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            right: 0;
+            left: 0;
+        }
+
+    </style>
+</head>
+<body>
+<div id="map"></div>
+<script>
+    var latLng = [23.119293, 113.321206]; // 广州
+    var map = L.map("map", {
+        center: latLng,
+        zoom: 12,
+        minZoom: 0,
+        maxZoom: 28
+    });
+
+    // 地图底图-广州市
+    L.esri.dynamicMapLayer({
+        url: 'http://10.150.157.24:6080/arcgis/rest/services/GEO_GUANGZHOU_LIGHT/MapServer',
+        // url: 'http://10.150.157.24:6080/arcgis/rest/services/GEO_GUANGZHOU_DARK/MapServer',
+        // layers: [2],
+        zIndex: 20
+    }).addTo(map);
+
+    // 地图数据
+    var dataLayer = L.esri.dynamicMapLayer({
+        url: 'http://10.150.157.24:6080/arcgis/rest/services/DWZYYBT/MapServer',
+        // layers: [2, 72, 101, 129, 145, 157, 166, 175, 179, 181, 183, 185],
+        layers: [2],
+        zIndex: 30
+    }).addTo(map);
+
+    map.on('click', function (e) {
+        dataLayer.identify().on(map).at(e.latlng).run(function (error, featureCollection) {
+            debugger;
+        });
+    });
+
+    /*
+       // 面 配电开关房
+        L.esri.featureLayer({
+            // url: 'https://services.arcgis.com/P3ePLMYs2RVChkJx/arcgis/rest/services/USA_Congressional_Districts/FeatureServer/0',
+            url: 'http://10.150.157.24:6080/arcgis/rest/services/DWZYYBT/Mapserver/3'
+        }).addTo(map);
+
+    // 线 中压架空线
+        var bikePaths = L.esri.featureLayer({
+            // url: 'https://services.arcgis.com/uCXeTVveQzP4IIcx/ArcGIS/rest/services/Bike_Routes/FeatureServer/0',
+            url: 'http://10.150.157.24:6080/arcgis/rest/services/DWZYYBT/Mapserver/9'
+        }).addTo(map);
+
+
+        // 点 变电站
+               L.esri.featureLayer({
+                 // url: 'https://services.arcgis.com/rOo16HdIMeOBI4Mb/arcgis/rest/services/Trimet_Transit_Stops/FeatureServer/0'
+                 url: 'http://10.150.157.24:6080/arcgis/rest/services/DWZYYBT/Mapserver/2'
+             }).addTo(map);
+
+
+        // 点 变电站
+     L.esri.Cluster.featureLayer({
+            // url: 'https://services.arcgis.com/rOo16HdIMeOBI4Mb/arcgis/rest/services/Trimet_Transit_Stops/FeatureServer/0'
+            url: 'http://10.150.157.24:6080/arcgis/rest/services/DWZYYBT/Mapserver/2'
+        }).addTo(map); */
+</script>
+</body>
+</html>
