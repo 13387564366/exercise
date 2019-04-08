@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- leaflet -->
+    <link href="./leaflet@1.4.0/leaflet.css" rel="stylesheet">
+    <script src="./leaflet@1.4.0/leaflet.js"></script>
+    <script src="./esri-leaflet@2.2.4/esri-leaflet.js"></script>
+
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+        }
+
+        #map {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            right: 0;
+            left: 0;
+        }
+
+        .property-info{
+            margin: 2px 0;
+        }
+        .property-info > label{
+            font-weight: bold;
+            font-size: 12px;
+        }
+        .property-info > span{
+            font-size: 14px;
+        }
+
+    </style>
+</head>
+<body>
+<div id="map"></div>
+
+<script>
+    var latLng = [33.83, -50.5];
+
+    var map = L.map("map", {
+        center: latLng,
+        zoom: 5,
+        minZoom: 3,
+        maxZoom: 24
+    });
+
+    // L.esri.basemapLayer('Gray').addTo(map);
+
+    var dataLayer = L.esri.dynamicMapLayer({
+        url: 'http://sampleserver6.arcgisonline.com/arcgis/rest/services/Hurricanes/MapServer/'
+    }).addTo(map);
+
+    map.on('click', function (e) {
+        dataLayer
+            .identify()
+            .on(map)
+            .at(e.latlng)
+            // .layers('visible:0')
+            // .layers('all')
+            .tolerance(10)
+            .run(function (error, featureCollection, res) {
+                console.log(featureCollection);
+                if (!featureCollection || !featureCollection.features || featureCollection.features.length === 0) {
+                    return;
+                }
+                var properties = featureCollection.features[0].properties;
+                var html = [];
+                for (var p in properties) {
+                    html.push('<div class="property-info"><label>' + p + '：</label><span>' + properties[p] + '</span></div>');
+                }
+                L.popup()
+                    .setLatLng(e.latlng)
+                    .setContent(html.join(' '))
+                    .openOn(map);
+            });
+    });
+
+</script>
+</body>
+</html>
