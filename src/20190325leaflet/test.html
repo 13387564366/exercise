@@ -1,0 +1,118 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>广州局沿步图简化版</title>
+    <!-- leaflet -->
+    <link href="./leaflet@1.4.0/leaflet.css" rel="stylesheet">
+    <script src="./leaflet@1.4.0/leaflet.js"></script>
+    <script src="./esri-leaflet@2.2.4/esri-leaflet.js"></script>
+
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+        }
+
+        #map {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            right: 0;
+            left: 0;
+        }
+
+        .property-info {
+            margin: 2px 0;
+        }
+
+        .property-info > label {
+            font-weight: bold;
+            font-size: 12px;
+        }
+
+        .property-info > span {
+            font-size: 14px;
+        }
+
+    </style>
+</head>
+<body>
+<div id="map"></div>
+<script>
+    var vectorMapUrlDX = "http://cache1.arcgisonline.cn/arcgis/rest/services/ChinaOnlineStreetPurplishBlue/MapServer"; //五彩斑斓的黑阶
+    // todo 修改测试地址
+    var YanBuTuMapLayerUrl = 'http://10.150.157.24:6080/arcgis/rest/services/DWZYYBT/MapServer'; // 广州局信息中心测试地址
+
+    /* 广州局沿步图数据图层 */
+    var YanBuTuMapLayer = null;
+
+    //初始化地图对象并指定中心
+    var mapCenter = new L.LatLng(23.10247, 113.37341);
+    var map = new L.Map('map', {
+        center: mapCenter,
+        zoom: 12,
+        crs: L.CRS.EPSG3857,
+        zoomControl: false//设置是否有缩放控件+-
+
+    });
+
+    map.on('click', function () {
+        loadYanBuTuMapInfo(e);
+    });
+
+    //加载瓦片数据-广州底图
+    gridBaseMap = L.esri.tiledMapLayer({
+        url: vectorMapUrlDX,
+        minZoom: 8,
+        maxZoom: 18
+    }).addTo(map);
+
+    function switchYanBuTuMapLayer(isShow) {
+        debugger; // todo 待测试
+        if (isShow) {
+            YanBuTuMapLayer = L.esri.dynamicMapLayer({
+                url: YanBuTuMapLayerUrl,
+                layers: [2, 38, 72, 101, 129, 145, 157, 166, 175, 179, 181, 183, 185, 3, 39, 73, 102, 130, 146, 158, 167, 4, 40, 74, 103, 131, 147, 159, 168, 5, 41, 75, 104, 132, 148, 160, 169, 6, 42, 76, 105, 133, 149, 161, 170, 7, 43, 77, 106, 134, 150, 162, 171, 8, 44, 78, 107, 135, 151, 163, 172, 176, 9, 45, 79, 108, 136, 152, 164, 173, 177, 10, 46, 80, 109, 12, 48, 83, 112, 139, 155, 13, 49, 84, 113, 25, 59, 94, 123, 141, 26, 60, 95, 124, 142, 27, 61, 96, 124, 143, 28, 62, 97, 125, 144, 29, 63, 98, 126, 145, 30, 64, 99, 127, 146]
+            }).addTo(map);
+        } else {
+            map.removeLayer(YanBuTuMapLayer);
+            YanBuTuMapLayer = null;
+        }
+    }
+
+    switchYanBuTuMapLayer(true);
+
+
+    /* 根据点击位置/坐标，加载沿步图图层详情 */
+    function loadYanBuTuMapInfo(e) {
+        if (!YanBuTuMapLayer) {
+            return;
+        }
+        YanBuTuMapLayer
+            .identify()
+            .on(map)
+            .at(e.latlng)
+            // .layers('visible:0')
+            // .layers('all')
+            .tolerance(10)
+            .run(function (error, featureCollection) {
+                if (!featureCollection || !featureCollection.features || featureCollection.features.length === 0) {
+                    return;
+                }
+                var properties = featureCollection.features[0].properties;
+                var html = [];
+                for (var p in properties) {
+                    html.push('<div class="property-info"><label>' + p + '：</label><span>' + properties[p] + '</span></div>');
+                }
+                L.popup()
+                    .setLatLng(e.latlng)
+                    .setContent(html.join(' '))
+                    .openOn(map);
+            });
+    }
+
+</script>
+</body>
+</html>
