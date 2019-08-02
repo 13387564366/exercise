@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Title</title>
+  <style>
+  body {
+    background: #ccc;
+    margin: 0;
+  }
+
+  .box-warp {
+  }
+
+  .clearfix:after {
+    display: block;
+    content: "clear";
+    height: 0;
+    clear: both;
+    overflow: hidden;
+    visibility: hidden;
+  }
+
+  .box-warp > div {
+    width: 28%;
+    padding-top: 28%;
+    position: relative;
+    float: left;
+    margin-left: 4%;
+    margin-top: 4%;
+    background: orangered;
+  }
+
+  .inner3 {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .flex-warp {
+    display: flex;
+    justify-content: space-evenly;
+    /*justify-content: space-between;*/
+  }
+
+/*  .flex-warp:before, .flex-warp:after {
+    content: '';
+    display: block;
+  }*/
+
+  .flex-warp > div {
+    width: 100px;
+    height: 100px;
+    background: #00A0E6;
+  }
+
+  .flex-warp-second {
+    display: flex;
+    justify-content: space-evenly;
+  }
+
+  .flex-warp-second > div {
+    width: 28%;
+    padding-top: 28%;
+    background: #e6ab33;
+  }
+
+  .table-warp {
+    display: table;
+    width: 100%;
+    border-spacing: 10px;
+  }
+
+  .table-warp > div {
+    height: 100px;
+    display: table-cell;
+    background: #00ee00;
+  }
+  </style>
+</head>
+<body>
+<div class="box-warp clearfix">
+  <div></div>
+  <div></div>
+  <div></div>
+  <div></div>
+  <div>
+    <div class="inner3">
+      dd的
+    </div>
+  </div>
+</div>
+<br>
+<br>
+<div class="flex-warp">
+  <div></div>
+  <div></div>
+  <div></div>
+</div>
+<br>
+<br>
+<div class="flex-warp-second">
+  <div></div>
+  <div></div>
+  <div></div>
+</div>
+<br>
+<br>
+<div class="table-warp">
+  <div></div>
+  <div></div>
+  <div></div>
+</div>
+</body>
+</html>
