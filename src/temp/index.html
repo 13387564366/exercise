@@ -75,7 +75,7 @@
         background: #3c8dbc;
         margin-right: 2.5%;
     }
-    .inner3{
+    .inner3 {
         position: absolute;
         left: 0;
         right: 0;
@@ -84,6 +84,21 @@
         display: flex;
         justify-content: center;
         align-items: center;
+    }
+    .display-test {
+        border: 5px solid yellowgreen;
+        background: #c3eea2;
+    }
+    .display-test::after {
+        clear: both;
+        display: table;
+        content: '';
+    }
+    .flow-box {
+        float: left;
+        width: 100px;
+        height: 100px;
+        background: rgba(222, 111, 222, 0.3);
     }
     </style>
 </head>
@@ -108,5 +123,10 @@
     <div></div>
     <div></div>
 </div>
+<div class="display-test">
+    <div class="flow-box"></div>
+    asdfadsaf,asdfadfad啊手动阀，士大夫
+</div>
+<div>新的一行内容</div>
 </body>
 </html>
