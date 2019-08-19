@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <title>Title</title>
+  <style>
+  html {
+    /* 使1rem等于10px */
+    font-size: 10px;
+  }
+
+  /*仅screen类设备使用，当屏幕尺寸>=800px时，以下css生效*/
+  @media only screen and (min-width: 800px) {
+    html {
+      /* 使1rem等于12px */
+      font-size: 12px;
+    }
+  }
+
+  @media only screen and (min-width: 1200px) {
+    html {
+      font-size: 14px;
+    }
+  }
+
+  .p-rem {
+    font-size: 1.4rem;
+  }
+
+  .p-px {
+    font-size: 14px;
+  }
+  </style>
+</head>
+<body>
+<p class="p-rem">使用rem单位，字体大小随屏幕大小改变</p>
+<p class="p-px">使用px单位</p>
+</body>
+</html>
