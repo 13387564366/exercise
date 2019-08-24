@@ -10,7 +10,14 @@
     height: 200px;
     border-radius: 50%;
     background: conic-gradient(#15B4FF 0, #15B4FF 30%, #0DF597 30%, #0DF597 60%, #FFC615 60%, #FFC615 100%);
-    background-size: 100px 100px;
+    /*background-size: 100px 100px;*/
+  }
+
+  .box {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    background: conic-gradient(transparent 0, transparent 92%, #08315f 92%, #08315f 100%);
   }
 
   .progressbar {
@@ -41,11 +48,49 @@
       background-size: calc(var(--progress) * 1%);
     }
   }
+
+  .p-san {
+    width: 0;
+    height: 0;
+    border-style: solid;
+    border-color: rebeccapurple deepskyblue yellowgreen deeppink;
+    border-width: 30px 20px 30px 20px;
+  }
+
+  .p-chart {
+    margin: 2rem 0;
+    width: 14rem;
+    height: 14rem;
+    box-sizing: border-box;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: conic-gradient(#10bd96 0, #10bd96 50%, #08315f 50%, #08315f 100%);
+  }
+
+  .p-chart>div{
+    width: 12.5rem;
+    height: 12.5rem;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: #08315f;
+  }
   </style>
 </head>
 <body>
 <div class="box"></div>
+<div class="box2"></div>
 <div class="progressbar"></div>
 <div class="progressbar-two"></div>
+<div class="p-san"></div>
+
+<div class="p-chart p-chart-left">
+  <div>
+    <span>出勤率</span>：97.08%
+  </div>
+</div>
 </body>
 </html>
