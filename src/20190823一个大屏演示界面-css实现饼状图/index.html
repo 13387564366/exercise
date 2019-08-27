@@ -36,7 +36,8 @@
   }
 
   html {
-    font-size: 62.5%;
+    /*font-size: 62.5%;*/
+    font-size: 110%;
     height: 100%;
     color: #fff;
     background: #08315f;
@@ -125,8 +126,8 @@
 
   .p-chart {
     margin: 2rem 0;
-    width: 14rem;
-    height: 14rem;
+    width: 15rem;
+    height: 15rem;
     box-sizing: border-box;
     border-radius: 50%;
     display: flex;
@@ -135,8 +136,8 @@
   }
 
   .p-chart > div {
-    width: 12rem;
-    height: 12rem;
+    width: 13rem;
+    height: 13rem;
     border-radius: 50%;
     display: flex;
     justify-content: center;
@@ -145,7 +146,7 @@
   }
 
   .p-chart-left {
-    background: conic-gradient(#10bd96 0, #10bd96 50%, #08315f 50%, #08315f 100%);
+    background: conic-gradient(#10bd96 0, #10bd96 50%, #fafafa 50%, #fafafa 100%);
   }
 
   .p-chart-left > div > span {
@@ -153,7 +154,7 @@
   }
 
   .p-chart-right {
-    background: conic-gradient(#e47f6c 0, #e47f6c 50%, #08315f 50%, #08315f 100%);
+    background: conic-gradient(#e47f6c 0, #e47f6c 50%, #fafafa 50%, #fafafa 100%);
   }
 
   .p-chart-right > div > span {
@@ -199,10 +200,13 @@
   }
 
   .p-row-detail {
-    width: 2.4rem;
-    height: 2.4rem;
-    background: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAHlJREFUOBHtk9EKwCAIRWV/V/3/S6/rP9wVthAvUrA9TgjqeDIREvkqVLVgnVirMKfQu4CWqJQIAE4zN2ARQCWYAO8e0UGymxCiR4/OdoFgAry728HTUN6Jr5o8PLF3/w5EaAZzUpsbX2Bgum1173YGeUi8+0xUcRNc8v8RU8ganP0AAAAASUVORK5CYII=") center no-repeat;
     cursor: pointer;
+    text-align: center;
+  }
+
+  .p-row-detail > img {
+    width: 1.6rem;
+    height: 1.6rem;
   }
 
   </style>
@@ -301,7 +305,7 @@
     </div>
     <div class="p-statistics-charts">
       <div>
-        <div class="p-statistics-num">普通人员总数：<span id="ordinaryPersonCountId">0</span></div>
+        <div class="p-statistics-num">现场人员总数：<span id="ordinaryPersonCountId">0</span></div>
         <div id="chartLeftId" class="p-chart p-chart-left">
           <div>
             <span>出勤率</span>：<span id="ordinaryId">0</span>%
@@ -324,15 +328,26 @@
       <div class="p-title">人员出勤信息</div>
       <div class="p-title-right"></div>
     </div>
+  </div>
+  <div class="p-content">
     <div class="p-row p-row-title">
       <div>姓名</div>
       <div>时间</div>
       <div>进出场信息</div>
       <div>详情</div>
     </div>
-  </div>
-  <div id="pContent" class="p-content">
-    <!--<div class="p-row"> <div>徐睿睿</div> <div>04:06</div> <div>进场</div> <div class="p-row-detail"></div> </div>-->
+    <div id="pContent">
+      <div class="p-row">
+        <!--<div>徐睿睿</div>
+        <div>04:06</div>
+        <div>进场</div>
+        <div class="p-row-detail">
+          <img
+            src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAHlJREFUOBHtk9EKwCAIRWV/V/3/S6/rP9wVthAvUrA9TgjqeDIREvkqVLVgnVirMKfQu4CWqJQIAE4zN2ARQCWYAO8e0UGymxCiR4/OdoFgAry728HTUN6Jr5o8PLF3/w5EaAZzUpsbX2Bgum1173YGeUi8+0xUcRNc8v8RU8ganP0AAAAASUVORK5CYII="
+            alt="">
+        </div>-->
+      </div>
+    </div>
   </div>
 </div>
 
@@ -351,8 +366,10 @@
   </div>
 </div>
 <script>
-const baseUrl = 'http://192.168.0.245:1111'
-const projectId = '720'
+// const baseUrl = 'http://192.168.0.245:1111'
+// const projectId = '720'
+const baseUrl = 'http://134.175.156.152:8081'
+const projectId = '1'
 
 const $dialogId = document.getElementById('dialogId')
 const $containerId = document.getElementById('containerId')
@@ -371,36 +388,6 @@ function request(url) {
     })
   })
 }
-
-// 统计人数
-request(`/construction/kqPsnStatistics?projectId=${projectId}`).then(obj => {
-  document.getElementById('psnCount').innerHTML = obj.psnCount
-  document.getElementById('attendCountId').innerHTML = obj.attendCount
-})
-
-// 统计考勤人数
-request(`/construction/attendanceInfo?projectId=${projectId}`).then(obj => {
-  let ordinary = (Number(obj.ordinaryAttendanceCount) / Number(obj.ordinaryPersonCount) * 100).toFixed(2)
-  let manage = (Number(obj.manageAttendanceCount) / Number(obj.managePersonCount) * 100).toFixed(2)
-  document.getElementById('ordinaryPersonCountId').innerHTML = obj.ordinaryPersonCount
-  document.getElementById('ordinaryAttendanceCountId').innerHTML = obj.ordinaryAttendanceCount
-  document.getElementById('ordinaryId').innerHTML = ordinary
-  document.getElementById('managePersonCountId').innerHTML = obj.managePersonCount
-  document.getElementById('manageAttendanceCountId').innerHTML = obj.manageAttendanceCount
-  document.getElementById('manageId').innerHTML = manage
-
-  document.getElementById('chartLeftId').style.background = `conic-gradient(#10bd96 0, #10bd96 ${ordinary}%, #08315f ${ordinary}%, #08315f 100%)`
-  document.getElementById('chartRightId').style.background = `conic-gradient(#e47f6c 0, #e47f6c ${manage}%, #08315f ${manage}%, #08315f 100%)`
-})
-
-// 人员出勤记录
-request(`/construction/attenRecord?projectId=${projectId}`).then(list => {
-  let html = []
-  list.forEach(item => {
-    html.push(`<div class="p-row"><div>${item.realname}</div><div>${item.attenTime}</div><div>${item.typeName}</div><div class="p-row-detail" onclick="detail(${item.userId})"></div></div>`)
-  })
-  document.getElementById('pContent').innerHTML = html.join(' ')
-})
 
 // 查看人员详情
 function detail(userId) {
@@ -456,6 +443,50 @@ function dialogHide() {
   $dialogId.style.display = 'none'
   $containerId.style.filter = 'none'
 }
+
+// 初始化页面数据
+function initPage() {
+
+// 统计人数
+  request(`/construction/kqPsnStatistics?projectId=${projectId}`).then(obj => {
+    document.getElementById('psnCount').innerHTML = obj.psnCount
+    document.getElementById('attendCountId').innerHTML = obj.attendCount
+  })
+
+// 统计考勤人数
+  request(`/construction/attendanceInfo?projectId=${projectId}`).then(obj => {
+    let ordinary = (Number(obj.ordinaryAttendanceCount) / Number(obj.ordinaryPersonCount) * 100).toFixed(2)
+    let manage = (Number(obj.manageAttendanceCount) / Number(obj.managePersonCount) * 100).toFixed(2)
+    document.getElementById('ordinaryPersonCountId').innerHTML = obj.ordinaryPersonCount
+    document.getElementById('ordinaryAttendanceCountId').innerHTML = obj.ordinaryAttendanceCount
+    document.getElementById('ordinaryId').innerHTML = ordinary
+    document.getElementById('managePersonCountId').innerHTML = obj.managePersonCount
+    document.getElementById('manageAttendanceCountId').innerHTML = obj.manageAttendanceCount
+    document.getElementById('manageId').innerHTML = manage
+
+    document.getElementById('chartLeftId').style.background = `conic-gradient(#10bd96 0, #10bd96 ${ordinary}%, #fafafa ${ordinary}%, #fafafa 100%)`
+    document.getElementById('chartRightId').style.background = `conic-gradient(#e47f6c 0, #e47f6c ${manage}%, #fafafa ${manage}%, #fafafa 100%)`
+  })
+
+// 人员出勤记录
+  request(`/construction/attenRecord?projectId=${projectId}`).then(list => {
+    let html = []
+    list.forEach(item => {
+      html.push(`<div class="p-row"><div>${item.realname}</div><div>${item.attenTime}</div><div>${item.typeName}</div>
+              <div class="p-row-detail" onclick="detail(${item.userId})">
+                <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAHlJREFUOBHtk9EKwCAIRWV/V/3/S6/rP9wVthAvUrA9TgjqeDIREvkqVLVgnVirMKfQu4CWqJQIAE4zN2ARQCWYAO8e0UGymxCiR4/OdoFgAry728HTUN6Jr5o8PLF3/w5EaAZzUpsbX2Bgum1173YGeUi8+0xUcRNc8v8RU8ganP0AAAAASUVORK5CYII=" alt="">
+              </div>
+             </div>`)
+    })
+    document.getElementById('pContent').innerHTML = html.join(' ')
+  })
+}
+
+initPage()
+
+setInterval(function () {
+  initPage()
+}, 1000 * 120)
 </script>
 </body>
 </html>

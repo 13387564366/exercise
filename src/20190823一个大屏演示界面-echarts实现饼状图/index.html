@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <title>人员统计</title>
+  <style>
+  /* 滚动条默认显示样式 */
+  ::-webkit-scrollbar-thumb {
+    background-color: #314cce;
+    height: 50px;
+    outline-offset: -2px;
+    outline: 2px solid #cddc39;
+    -webkit-border-radius: 4px;
+    border: 2px solid #314cce;
+  }
+
+  /* 鼠标点击滚动条显示样式 */
+  ::-webkit-scrollbar-thumb:hover {
+    background-color: #0d346f;
+    height: 50px;
+    -webkit-border-radius: 4px;
+  }
+
+  /* 滚动条模块大小 */
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+
+  /* 滚动框背景样式 */
+  ::-webkit-scrollbar-track-piece {
+    background-color: #08315f;
+    -webkit-border-radius: 0;
+  }
+
+  html {
+    /*font-size: 62.5%;*/
+    font-size: 110%;
+    height: 100%;
+    color: #fff;
+    background: #08315f;
+  }
+
+  body {
+    font-size: 1.4rem;
+    margin: 0;
+    height: 100%;
+  }
+
+  .p-container {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .p-content {
+    overflow: auto;
+  }
+
+  .p-navbar {
+    background: #314cce;
+    height: 4.6rem;
+    font-size: 1.8rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .p-navbar:before, .p-navbar:after {
+    content: '';
+    display: block;
+  }
+
+  .p-title-warp {
+    display: flex;
+    justify-content: center;
+    margin: 0.5rem;
+  }
+
+  .p-title {
+    font-size: 1.8rem;
+    background: #314cce;
+    width: 11.4rem;
+    height: 4rem;
+    line-height: 4rem;
+    text-align: center;
+    letter-spacing: 1px;
+  }
+
+  .p-title-left {
+    width: 0;
+    height: 0;
+    border-style: solid;
+    border-color: #314cce #314cce transparent transparent;
+    border-width: 2rem 1rem 2rem 1rem;
+  }
+
+  .p-title-right {
+    width: 0;
+    height: 0;
+    border-style: solid;
+    border-color: #314cce transparent transparent #314cce;
+    border-width: 2rem 1rem 2rem 1rem;
+  }
+
+
+  .p-statistics-charts {
+    display: flex;
+    justify-content: space-between;
+    font-size: 1.6rem;
+    margin: 1.4rem 0;
+    text-align: center;
+  }
+
+  .p-statistics-charts:before, .p-statistics-charts:after {
+    content: '';
+    display: block;
+  }
+
+  .p-statistics-num {
+    font-size: 1.6rem;
+    text-align: center;
+  }
+
+  .p-chart-warp {
+    position: relative;
+  }
+
+  .p-chart-info {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 1.8rem;
+  }
+
+
+  .p-chart {
+    width: 24rem;
+    height: 24rem;
+    box-sizing: border-box;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+
+  .p-chart-right > div > span {
+    color: #e47f6c;
+  }
+
+  .p-legend:before {
+    content: '';
+    display: inline-block;
+    width: 1rem;
+    height: 1rem;
+    background-color: #10bd96;
+    margin-right: 0.4rem;
+  }
+
+  .p-legend-right:before {
+    background-color: #e47f6c;
+  }
+
+  .p-row {
+    display: flex;
+    justify-content: space-around;
+    height: 2.4rem;
+    line-height: 2.4rem;
+    font-size: 1.2rem;
+    text-align: center;
+  }
+
+  .p-row:hover {
+    font-size: 1.3rem;
+  }
+
+  .p-row > div {
+    flex: 1;
+  }
+
+  .p-row:nth-child(even) {
+    background: #0d346f;
+  }
+
+  .p-row-title {
+    background: #314cce !important;
+  }
+
+  .p-row-detail {
+    cursor: pointer;
+    text-align: center;
+  }
+
+  .p-row-detail > img {
+    width: 1.6rem;
+    height: 1.6rem;
+  }
+
+  </style>
+  <style>
+  .p-dialog {
+    width: 46rem;
+    height: 34rem;
+    background: #154882;
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    top: 0;
+    margin: auto;
+    font-size: 1.2rem;
+    display: none; /* 默认隐藏dialog */
+  }
+
+  .p-dialog-animation {
+    animation: show-animation 1s;
+  }
+
+
+  @keyframes show-animation {
+    0% {
+      display: block;
+      opacity: 0;
+    }
+    100% {
+      opacity: 1;
+    }
+  }
+
+  .d-dialog-title {
+    font-size: 1.6rem;
+    height: 4rem;
+    padding: 0 1rem;
+    border-bottom: 1px solid #1863b8;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .d-dialog-close {
+    width: 2rem;
+    height: 2rem;
+    background: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABIAAAASCAYAAABWzo5XAAAAAXNSR0IArs4c6QAAAOxJREFUOBGVlDEOwjAMRSugU0doByYWhl4A7tuJjYt0ZOUOMDCH9ytcmUKa1NJXnMh+ThM3RYGFEM6okr/EyNmjdsj5QBjCDTW5IGJP6IFeqNRuKiSILAtGnEGU043FmTQoC0ach1yYr0eQnBxYEmLEOVg2ZA62GBKB3QE9kez3TCwpNpKkCxDE7IrzfbAueeX8qXtgYecWj/hbN0+7VPZXrJ341qjTBCImkOFMWJv22TzsH8SqZ8PmIA5WExf/zBxIEgZET4H+YllWnxDnz6wfirDYIj0FHYr2ie3IRmIF65F6bWOw0gKWjgZ5A8+398bNYJGGAAAAAElFTkSuQmCC") center no-repeat;
+    cursor: pointer;
+  }
+
+  .d-dialog-content {
+    display: flex;
+  }
+
+  .d-avatar {
+    margin: 2rem;
+    width: 12rem;
+    height: 14rem;
+  }
+
+  .d-avatar > img {
+    object-fit: cover;
+    width: 100%;
+    max-width: 100%;
+    max-height: 100%;
+  }
+
+  .d-name {
+    font-size: 1.8rem;
+    text-align: center;
+    margin: 1rem 0;
+    font-weight: bold;
+  }
+
+  .d-user-info-row {
+    display: flex;
+    margin: 2rem;
+  }
+
+  .d-user-info-row > div:first-child {
+    width: 12rem;
+  }
+  </style>
+</head>
+<body>
+<div id="containerId" class="p-container">
+  <div>
+    <div class="p-navbar">
+      <div>总人数：<span id="psnCount">0</span>人</div>
+      <div>出勤人数：<span id="attendCountId">0</span>人</div>
+    </div>
+    <div class="p-title-warp">
+      <div class="p-title-left"></div>
+      <div class="p-title">人员统计</div>
+      <div class="p-title-right"></div>
+    </div>
+    <div class="p-statistics-charts">
+      <div>
+        <div class="p-statistics-num">现场人员总数：<span id="ordinaryPersonCountId">0</span></div>
+        <div class="p-chart-warp">
+          <div id="chartLeftId" class="p-chart"></div>
+          <div class="p-chart-info">
+            <span style="color: #10bd96">出勤率</span>：<span id="ordinaryId">0</span>%
+          </div>
+        </div>
+        <div class="p-legend" id="ordinaryAttendanceCountId">0</div>
+      </div>
+      <div>
+        <div class="p-statistics-num">管理人员总数：<span id="managePersonCountId">0</span></div>
+        <div class="p-chart-warp">
+          <div id="chartRightId" class="p-chart"></div>
+          <div class="p-chart-info">
+            <span style="color: #e47f6c">出勤率</span>：<span id="manageId">0</span>%
+          </div>
+        </div>
+        <div class="p-legend p-legend-right" id="manageAttendanceCountId">0</div>
+      </div>
+    </div>
+    <div class="p-title-warp">
+      <div class="p-title-left"></div>
+      <div class="p-title">人员出勤信息</div>
+      <div class="p-title-right"></div>
+    </div>
+  </div>
+  <div class="p-content">
+    <div class="p-row p-row-title">
+      <div>姓名</div>
+      <div>时间</div>
+      <div>进出场信息</div>
+      <div>详情</div>
+    </div>
+    <div id="pContent">
+     <!-- <div class="p-row">
+        <div>徐睿睿</div>
+        <div>04:06</div>
+        <div>进场</div>
+        <div class="p-row-detail">
+          <img
+            src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAHlJREFUOBHtk9EKwCAIRWV/V/3/S6/rP9wVthAvUrA9TgjqeDIREvkqVLVgnVirMKfQu4CWqJQIAE4zN2ARQCWYAO8e0UGymxCiR4/OdoFgAry728HTUN6Jr5o8PLF3/w5EaAZzUpsbX2Bgum1173YGeUi8+0xUcRNc8v8RU8ganP0AAAAASUVORK5CYII="
+            alt="">
+        </div>
+      </div>-->
+    </div>
+  </div>
+</div>
+
+<div id="dialogId" class="p-dialog p-dialog-animation">
+  <div class="d-dialog-title">
+    <div id="userTypeId">孔小宝（施工人员）</div>
+    <div class="d-dialog-close" onclick="dialogHide()"></div>
+  </div>
+  <div class="d-dialog-content">
+    <div class="d-avatar">
+      <img id="avatarId"
+           src="https://ss1.bdstatic.com/70cFuXSh_Q1YnxGkpoWK1HF6hhy/it/u=4029880441,3505916240&fm=15&gp=0.jpg" alt="">
+      <div id="realnameId" class="d-name">孔小宝</div>
+    </div>
+    <div id="userInfoId" class="d-user-info"></div>
+  </div>
+</div>
+<script src="echarts.min.js"></script>
+<script>
+// const baseUrl = 'http://192.168.0.245:1111'
+// const projectId = '720'
+const baseUrl = 'http://134.175.156.152:8081'
+const projectId = '1'
+
+const $dialogId = document.getElementById('dialogId')
+const $containerId = document.getElementById('containerId')
+
+function request(url) {
+  return new Promise((resolve, reject) => {
+    fetch(`${baseUrl}${url}`)
+      .then(response => response.json())
+      .then(res => res.result)
+      .then(obj => {
+        resolve(obj)
+      }).catch(err => {
+      console.error('请求出错：' + url)
+      console.error(err)
+      reject()
+    })
+  })
+}
+
+// 查看人员详情
+function detail(userId) {
+  $containerId.style.filter = 'blur(2px)'
+  // 查看人员详情
+  request(`/construction/detail?userId=${userId}`).then(obj => {
+    document.getElementById('realnameId').innerHTML = `${obj.realname}`
+    document.getElementById('userTypeId').innerHTML = `${obj.realname}（${obj.userTypeName}）`
+    document.getElementById('avatarId').src = `${obj.collectPicture}`
+    document.getElementById('userInfoId').innerHTML = `
+     <div class="d-user-info-row">
+        <div>身份证号：</div>
+        <div>${obj.idCardNum}</div>
+      </div>
+      <div class="d-user-info-row">
+        <div>手机号码：</div>
+        <div>${obj.phone}</div>
+      </div>
+      <div class="d-user-info-row">
+        <div>性别：</div>
+        <div>${obj.gender}</div>
+      </div>
+      <div class="d-user-info-row">
+        <div>年龄：</div>
+        <div>${obj.age}</div>
+      </div>
+      <div class="d-user-info-row">
+        <div>出生日期：</div>
+        <div>${obj.birth}</div>
+      </div>
+      <div class="d-user-info-row">
+        <div>认证状态：</div>
+        <div style="color: #33eaad">${obj.certifiedName}</div>
+      </div>
+      <div class="d-user-info-row">
+        <div>工作状态：</div>
+        <div>${obj.workStatusName}</div>
+      </div>
+      <div class="d-user-info-row">
+        <div>是否重点关注人员：</div>
+        <div>${obj.isPointName}</div>
+      </div>
+     `
+    dialogShow()
+  })
+}
+
+function dialogShow() {
+  $dialogId.style.display = 'block'
+}
+
+function dialogHide() {
+  $dialogId.style.display = 'none'
+  $containerId.style.filter = 'none'
+}
+
+// 创建图表
+function createChart(id, v1, v2, color) {
+  let myChart = echarts.init(document.getElementById(id))
+  let option = {
+    color: color,
+    series: [
+      {
+        type: 'pie',
+        radius: ['70%', '85%'],
+        avoidLabelOverlap: false,
+        label: {
+          normal: {
+            show: false,
+          },
+        },
+        data: [
+          { value: v1, name: '出勤人数' },
+          { value: v2, name: '未出勤人数' }
+        ]
+      }
+    ]
+  }
+  myChart.setOption(option)
+}
+
+// 初始化页面数据
+function initPage() {
+
+// 统计人数
+  request(`/construction/kqPsnStatistics?projectId=${projectId}`).then(obj => {
+    document.getElementById('psnCount').innerHTML = obj.psnCount
+    document.getElementById('attendCountId').innerHTML = obj.attendCount
+  })
+
+// 统计考勤人数
+  request(`/construction/attendanceInfo?projectId=${projectId}`).then(obj => {
+    let ordinary = (Number(obj.ordinaryAttendanceCount) / Number(obj.ordinaryPersonCount) * 100).toFixed(2)
+    let manage = (Number(obj.manageAttendanceCount) / Number(obj.managePersonCount) * 100).toFixed(2)
+    document.getElementById('ordinaryPersonCountId').innerHTML = obj.ordinaryPersonCount
+    document.getElementById('ordinaryAttendanceCountId').innerHTML = obj.ordinaryAttendanceCount
+    document.getElementById('ordinaryId').innerHTML = ordinary
+    document.getElementById('managePersonCountId').innerHTML = obj.managePersonCount
+    document.getElementById('manageAttendanceCountId').innerHTML = obj.manageAttendanceCount
+    document.getElementById('manageId').innerHTML = manage
+
+    createChart('chartLeftId', Number(obj.ordinaryAttendanceCount), Number(obj.ordinaryPersonCount) - Number(obj.ordinaryAttendanceCount), ['#10bd96', '#fafafa'])
+    createChart('chartRightId', Number(obj.manageAttendanceCount), Number(obj.managePersonCount) - Number(obj.manageAttendanceCount), ['#e47f6c', '#fafafa'])
+  })
+
+
+// 人员出勤记录
+  request(`/construction/attenRecord?projectId=${projectId}`).then(list => {
+    let html = []
+    list.forEach(item => {
+      html.push(`<div class="p-row"><div>${item.realname}</div><div>${item.attenTime}</div><div>${item.typeName}</div>
+              <div class="p-row-detail" onclick="detail(${item.userId})">
+                <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAHlJREFUOBHtk9EKwCAIRWV/V/3/S6/rP9wVthAvUrA9TgjqeDIREvkqVLVgnVirMKfQu4CWqJQIAE4zN2ARQCWYAO8e0UGymxCiR4/OdoFgAry728HTUN6Jr5o8PLF3/w5EaAZzUpsbX2Bgum1173YGeUi8+0xUcRNc8v8RU8ganP0AAAAASUVORK5CYII=" alt="">
+              </div>
+             </div>`)
+    })
+    document.getElementById('pContent').innerHTML = html.join(' ')
+  })
+}
+
+initPage()
+
+setInterval(function () {
+  initPage()
+}, 1000 * 120)
+</script>
+</body>
+</html>
