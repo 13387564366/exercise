@@ -36,8 +36,8 @@
   }
 
   html {
-    /*font-size: 62.5%;*/
-    font-size: 110%;
+    font-size: 62.5%;
+    /*font-size: 110%;*/
     height: 100%;
     color: #fff;
     background: #08315f;
@@ -117,6 +117,13 @@
   .p-statistics-charts:before, .p-statistics-charts:after {
     content: '';
     display: block;
+  }
+
+  .p-statistics-title {
+    font-size: 2.2rem;
+    font-weight: bold;
+    color: #ccc;
+    margin-bottom: 1rem;
   }
 
   .p-statistics-num {
@@ -289,7 +296,7 @@
 <div id="containerId" class="p-container">
   <div>
     <div class="p-navbar">
-      <div>总人数：<span id="psnCount">0</span>人</div>
+      <div>进场总人数：<span id="psnCountId">0</span>人（已认证）</div>
       <div>出勤人数：<span id="attendCountId">0</span>人</div>
     </div>
     <div class="p-title-warp">
@@ -299,7 +306,8 @@
     </div>
     <div class="p-statistics-charts">
       <div>
-        <div class="p-statistics-num">现场人员总数：<span id="ordinaryPersonCountId">0</span></div>
+        <div class="p-statistics-title">施工人员出勤情况</div>
+        <div class="p-statistics-num">出勤人数/总人数：<span id="ordinaryPersonId">0</span></div>
         <div class="p-chart-warp">
           <div id="chartLeftId" class="p-chart"></div>
           <div class="p-chart-info">
@@ -309,7 +317,8 @@
         <div class="p-legend" id="ordinaryAttendanceCountId">0</div>
       </div>
       <div>
-        <div class="p-statistics-num">管理人员总数：<span id="managePersonCountId">0</span></div>
+        <div class="p-statistics-title">管理人员出勤情况</div>
+        <div class="p-statistics-num">出勤人数/总人数：：<span id="managePersonId">0</span></div>
         <div class="p-chart-warp">
           <div id="chartRightId" class="p-chart"></div>
           <div class="p-chart-info">
@@ -333,16 +342,16 @@
       <div>详情</div>
     </div>
     <div id="pContent">
-     <!-- <div class="p-row">
-        <div>徐睿睿</div>
-        <div>04:06</div>
-        <div>进场</div>
-        <div class="p-row-detail">
-          <img
-            src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAHlJREFUOBHtk9EKwCAIRWV/V/3/S6/rP9wVthAvUrA9TgjqeDIREvkqVLVgnVirMKfQu4CWqJQIAE4zN2ARQCWYAO8e0UGymxCiR4/OdoFgAry728HTUN6Jr5o8PLF3/w5EaAZzUpsbX2Bgum1173YGeUi8+0xUcRNc8v8RU8ganP0AAAAASUVORK5CYII="
-            alt="">
-        </div>
-      </div>-->
+      <!-- <div class="p-row">
+         <div>徐睿睿</div>
+         <div>04:06</div>
+         <div>进场</div>
+         <div class="p-row-detail">
+           <img
+             src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAHlJREFUOBHtk9EKwCAIRWV/V/3/S6/rP9wVthAvUrA9TgjqeDIREvkqVLVgnVirMKfQu4CWqJQIAE4zN2ARQCWYAO8e0UGymxCiR4/OdoFgAry728HTUN6Jr5o8PLF3/w5EaAZzUpsbX2Bgum1173YGeUi8+0xUcRNc8v8RU8ganP0AAAAASUVORK5CYII="
+             alt="">
+         </div>
+       </div>-->
     </div>
   </div>
 </div>
@@ -363,10 +372,10 @@
 </div>
 <script src="echarts.min.js"></script>
 <script>
-// const baseUrl = 'http://192.168.0.245:1111'
-// const projectId = '720'
-const baseUrl = 'http://134.175.156.152:8081'
-const projectId = '1'
+const baseUrl = 'http://localhost:1111'
+const projectId = '720'
+// const baseUrl = 'http://116.62.135.33/api/public/luosida/'
+// const projectId = '1'
 
 const $dialogId = document.getElementById('dialogId')
 const $containerId = document.getElementById('containerId')
@@ -390,7 +399,7 @@ function request(url) {
 function detail(userId) {
   $containerId.style.filter = 'blur(2px)'
   // 查看人员详情
-  request(`/construction/detail?userId=${userId}`).then(obj => {
+  request(`/detail?userId=${userId}`).then(obj => {
     document.getElementById('realnameId').innerHTML = `${obj.realname}`
     document.getElementById('userTypeId').innerHTML = `${obj.realname}（${obj.userTypeName}）`
     document.getElementById('avatarId').src = `${obj.collectPicture}`
@@ -470,19 +479,19 @@ function createChart(id, v1, v2, color) {
 function initPage() {
 
 // 统计人数
-  request(`/construction/kqPsnStatistics?projectId=${projectId}`).then(obj => {
-    document.getElementById('psnCount').innerHTML = obj.psnCount
+  request(`/kqPsnStatistics?projectId=${projectId}`).then(obj => {
+    document.getElementById('psnCountId').innerHTML = obj.psnCount
     document.getElementById('attendCountId').innerHTML = obj.attendCount
   })
 
 // 统计考勤人数
-  request(`/construction/attendanceInfo?projectId=${projectId}`).then(obj => {
+  request(`/attendanceInfo?projectId=${projectId}`).then(obj => {
     let ordinary = (Number(obj.ordinaryAttendanceCount) / Number(obj.ordinaryPersonCount) * 100).toFixed(2)
     let manage = (Number(obj.manageAttendanceCount) / Number(obj.managePersonCount) * 100).toFixed(2)
-    document.getElementById('ordinaryPersonCountId').innerHTML = obj.ordinaryPersonCount
+    document.getElementById('ordinaryPersonId').innerHTML = obj.ordinaryAttendanceCount + ' / ' + obj.ordinaryPersonCount
     document.getElementById('ordinaryAttendanceCountId').innerHTML = obj.ordinaryAttendanceCount
     document.getElementById('ordinaryId').innerHTML = ordinary
-    document.getElementById('managePersonCountId').innerHTML = obj.managePersonCount
+    document.getElementById('managePersonId').innerHTML = obj.manageAttendanceCount + ' / ' + obj.managePersonCount
     document.getElementById('manageAttendanceCountId').innerHTML = obj.manageAttendanceCount
     document.getElementById('manageId').innerHTML = manage
 
@@ -490,9 +499,8 @@ function initPage() {
     createChart('chartRightId', Number(obj.manageAttendanceCount), Number(obj.managePersonCount) - Number(obj.manageAttendanceCount), ['#e47f6c', '#fafafa'])
   })
 
-
 // 人员出勤记录
-  request(`/construction/attenRecord?projectId=${projectId}`).then(list => {
+  request(`/attenRecord?projectId=${projectId}`).then(list => {
     let html = []
     list.forEach(item => {
       html.push(`<div class="p-row"><div>${item.realname}</div><div>${item.attenTime}</div><div>${item.typeName}</div>

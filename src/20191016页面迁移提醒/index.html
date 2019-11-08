@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <title>关于网站迁移的公告</title>
+  <style>
+  html, body {
+    height: 100%;
+    font-size: 20px;
+  }
+
+  body{
+    margin: 0;
+    background: url("bg.png") no-repeat;
+  }
+  .content {
+    width: 720px;
+    height: 300px;
+    background: #fff;
+    padding: 20px 30px;
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    margin: auto;
+  }
+  </style>
+</head>
+<body>
+<div class="content">
+  <h2 style="text-align: center">关于网站迁移的公告</h2>
+  <p>为了提供更好的用户体验，网站将启用域名访问，<a href="https://www.zhgkxt.com/">https://www.zhgkxt.com/</a>，因域名改变给您带来的不便敬请谅解。</p>
+  <p><span id="second">5</span>秒后自动跳转到：<a href="https://www.zhgkxt.com/">https://www.zhgkxt.com/</a></p>
+</div>
+<script>
+let second = 5;
+(function setSecond() {
+  document.getElementById('second').innerText = second
+  if (second === 0) {
+    window.location.href = 'https://www.zhgkxt.com/'
+    return
+  }
+  setTimeout(function () {
+    second--
+    setSecond()
+  }, 1000)
+})()
+</script>
+</body>
+</html>

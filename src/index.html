@@ -21,7 +21,9 @@
     </style>
 </head>
 <body class="container">
+<img src="112.jpg" alt="" srcset>
     <ul >
+        <li><a href="/src/20191016页面迁移提醒/index.html">20191016页面迁移提醒</a></li>
         <li><a href="/src/20190823一个大屏演示界面-echarts实现饼状图/index.html">20190823一个大屏演示界面-echarts实现饼状图</a></li>
         <li><a href="/src/20190823一个大屏演示界面-css实现饼状图/index.html">20190823一个大屏演示界面-css实现饼状图</a></li>
         <li><a href="/src/20190819媒体查询，字体大小自适应/index.html">20190819媒体查询，字体大小自适应</a></li>
@@ -33,6 +35,14 @@
         <li><a href="/src/20181207rxjs/index.html">20181207 rxjs</a></li>
         <li><a href="/src/20180925vue/index.html">20180925 vue</a></li>
         <li><a href="/src/20180410ajax/http.html">20180410 ajax</a></li>
+        <li><a href="/src/20191006页面转图片/index.html">20191006页面转图片</a></li>
     </ul>
+    <script src="./libs/jquery.js"></script>
+    <script src="https://unpkg.com/flyio/dist/fly.min.js"></script>
+    <script>
+        $.post('http://localhost:8989/demo/user/open/view/findUsernameById/12',function(res){
+            debugger
+        })
+    </script>
 </body>
 </html>
